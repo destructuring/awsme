@@ -28,8 +28,8 @@ function build_ami {
   local COMMAND_EXTRA=
   
   local nm_keypair="tmp-build-ami-keypair-$(date +%s)-$$"
-  if [[ -f "$FLAGS_sshkey" ]]; then
-    ec2-import-keypair --region $FLAGS_region --public-key-file $FLAGS_sshkey $nm_keypair
+  if [[ -f "$FLAGS_sshauth" ]]; then
+    ec2-import-keypair --region $FLAGS_region --public-key-file $FLAGS_sshauth $nm_keypair
     COMMAND_EXTRA="-k $nm_keypair $COMMAND_EXTRA"
   else
     COMMAND_EXTRA="-k default $COMMAND_EXTRA"
@@ -37,7 +37,6 @@ function build_ami {
 
   local source_ami="$(pick_ami)"
   COMMAND="ec2-run-instances --region $FLAGS_region -K $EC2_PRIVATE_KEY -C $EC2_CERT $source_ami -n 1 -t $FLAGS_instype --instance-initiated-shutdown-behavior stop -f $shome/libexec/ubuntu.sh $COMMAND_EXTRA"
-  "Running $COMMAND"; echo
 
   local tmp_run="$(mktemp -t XXXXXXXXX)"
   $COMMAND | tee "$tmp_run"
@@ -77,7 +76,7 @@ function build_ami {
     AMI_NAME=`date "+base_%Y-%m-%d-%H-%M"`
     ec2cim --region "$FLAGS_region" -K $EC2_PRIVATE_KEY -C $EC2_CERT -n $AMI_NAME $INSTANCE_ID
     ec2-terminate-instances --region "$FLAGS_region" $INSTANCE_ID
-    if [[ -f "$FLAGS_sshkey" ]]; then
+    if [[ -f "$FLAGS_sshauth" ]]; then
       ec2-delete-keypair --region $FLAGS_region $nm_keypair
     fi
   fi
