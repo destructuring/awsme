@@ -1,0 +1,98 @@
+#!/bin/bash
+
+# parse the command-line
+DEFINE_string 'region' 'us-east-1' 'AWS region' 'R'
+DEFINE_string 'disk' 'ebs' 'AWS disk type' 'B'
+DEFINE_string 'arch' 'amd64' 'AWS arch' 'A'
+DEFINE_string 'instype' 'm1.large' "AWS instance type" "T"
+DEFINE_string 'release' 'precise' 'Ubuntu release' 'U'
+DEFINE_string 'sshkey' "$HOME/.ssh/id_rsa.pub" 'SSH public key path' 's'
+
+function pick_ami {
+	# This selects the most recent release Ubuntu cloud image
+  curl -s http://cloud-images.ubuntu.com/rss/${FLAGS_release}-release.xml | \
+    awk '$1 ~ /^<br>/ { sub(/^<br>/, "", $0); print }' | \
+    awk -v region="$FLAGS_region" -v disk="$FLAGS_disk" -v arch="$FLAGS_arch" '$1 == region && $3 == arch && $4 == disk { ami = $2 } END { print ami }'
+}
+
+function build_ami {
+  require ec2
+
+  prep_awscli
+
+  # Build AMI
+  local COMMAND_EXTRA=
+  
+  local nm_keypair="tmp-build-ami-keypair-$(date +%s)-$$"
+  if [[ -f "$FLAGS_sshkey" ]]; then
+    ec2-import-keypair --region $FLAGS_region --public-key-file $FLAGS_sshkey $nm_keypair
+    COMMAND_EXTRA="-k $nm_keypair $COMMAND_EXTRA"
+  else
+    COMMAND_EXTRA="-k default $COMMAND_EXTRA"
+  fi
+
+  local source_ami="$(pick_ami)"
+  COMMAND="ec2-run-instances --region $FLAGS_region -K $EC2_PRIVATE_KEY -C $EC2_CERT $source_ami -n 1 -t $FLAGS_instype --instance-initiated-shutdown-behavior stop -f $shome/libexec/ubuntu.sh $COMMAND_EXTRA"
+  "Running $COMMAND"; echo
+
+  local tmp_run="$(mktemp -t XXXXXXXXX)"
+  $COMMAND | tee "$tmp_run"
+  local INSTANCE_ID="$(awk '$1 == "INSTANCE" {print $2}' "$tmp_run")"
+  rm -f "$tmp_run"
+
+  if [[ -n "$INSTANCE_ID" ]]; then
+    local status="$(ec2din --region "$FLAGS_region" "$INSTANCE_ID" | awk '$1 == "INSTANCE" { print $4 }')"
+    local last_status
+    while [[ "$status" != "stopped" && "$status" != "terminated" ]]; do
+      if [[ "$status" != "$last_status" ]]; then
+        if [[ -n "$last_status" ]]; then
+          echo
+        fi
+        echo "status: $status"
+        last_status="$status"
+
+        if [[ "$status" != "pending" ]]; then
+          while true; do
+            if nc -z "$status" 22; then
+              ssh -o "StrictHostKeyChecking no" ubuntu@"$status" bash -c "'while [[ ! -f /var/log/user-data.log ]]; do sleep 1; done; tail -f /var/log/user-data.log'" || true
+              break
+            else
+              echo -n '.'
+              sleep 5
+            fi
+          done
+        fi
+      else
+        echo -n "."
+      fi
+      sleep 5
+      status="$(ec2din --region "$FLAGS_region" "$INSTANCE_ID" | awk '$1 == "INSTANCE" { print $4 }')"
+    done
+    echo
+
+    AMI_NAME=`date "+base_%Y-%m-%d-%H-%M"`
+    ec2cim --region "$FLAGS_region" -K $EC2_PRIVATE_KEY -C $EC2_CERT -n $AMI_NAME $INSTANCE_ID
+    ec2-terminate-instances --region "$FLAGS_region" $INSTANCE_ID
+    if [[ -f "$FLAGS_sshkey" ]]; then
+      ec2-delete-keypair --region $FLAGS_region $nm_keypair
+    fi
+  fi
+}
+
+function prep_awscli {
+  pushd "$shome" > /dev/null
+
+  if [[ ! -x "$shome/.awscli/bin/python" ]]; then
+    python $shome/libexec/virtualenv.py --extra-search-dir=$shome/vendor --never-download .awscli
+  fi
+
+  set +u
+  source $shome/.awscli/bin/activate
+  set -u
+
+  if [[ ! -x "$(type -P aws)" ]]; then
+    pip install --index-url=file://${shome}/vendor/cache/pip/simple awscli
+  fi
+
+  popd > /dev/null
+}

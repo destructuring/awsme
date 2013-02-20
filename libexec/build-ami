@@ -1,0 +1,24 @@
+#!/bin/bash
+
+#/ NAME
+#/     build ami -- builds an AMI image
+#/
+#/ SYNOPSIS
+#/   bin/build ami
+#/
+#/ EXAMPLES
+#/     $ bin/build ami
+
+# figure out the project root under which bin, lib live
+shome="$(cd -P -- "$(dirname -- "$BASH_SOURCE")/.." && pwd -P)"
+
+# load a jason bourne library
+source "$shome/libexec/_jason"
+require build
+
+# entry point
+function main {
+  time build_ami $FLAGS_branch
+}
+
+require sub "$BASH_SOURCE" "$@"

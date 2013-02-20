@@ -1,0 +1,29 @@
+#!/bin/bash
+
+#/ NAME
+#/     ec2-wrapper -- sets up environment and proxies to actual ec2 script
+#/
+#/ SYNOPSIS
+#/     symlink ec2-wrapper to bin/ec2ver, etc.
+
+# figure out the project root under which bin, lib live
+shome="$(cd -P -- "$(dirname -- "$BASH_SOURCE")/../.." && pwd -P)"
+
+# load a jason bourne library
+source "$shome/libexec/_jason"
+require ec2
+
+# entry point
+function main {
+  readonly local nm_cmd="$(basename $0)"
+  readonly local pth_script="$(set +f; ls -d $shome/vendor/projects/*/bin/$nm_cmd 2>&-)"
+
+  if [[ -x "$pth_script" ]]; then
+    exec $pth_script "$@"
+  else
+    logger_fatal "can't find actual $nm_cmd script"
+    exit 1
+  fi
+}
+
+require sub "$BASH_SOURCE" "$@"

@@ -5,3 +5,8 @@
 /tmp
 /crash.log
 /output
+/libexec/virtualenv.pyc
+/.awscli
+/install
+/vendor/projects
+/config/*.yml

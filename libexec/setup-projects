@@ -1,0 +1,39 @@
+#!/bin/bash
+
+#/ NAME
+#/     setup projects -- symlinks versioned vendor/projects/* into setup/
+#/
+#/ SYNOPSIS
+#/     setup projects
+
+# figure out the project root under which bin, lib live
+shome="$(cd -P -- "$(dirname -- "$BASH_SOURCE")/.." && pwd -P)"
+
+# load a jason bourne library
+source "$shome/libexec/_jason"
+
+# entry point
+function main {
+  cd "$shome"
+  rm -rf install
+  mkdir -p install vendor/projects
+
+  cd install
+  find ../vendor/projects ! -type d | cut -d/ -f5- | grep / | perl -pe 's{[^/\s]+$}{}' | sort -u | xargs -- mkdir -p
+  find ../vendor/projects ! -type d | while read -r a; do 
+    local prefix="$(echo "$a" | cut -d/ -f5- | perl -pe 's{[^/\s]+$}{}; s{[^/\s]+}{..}g')"
+    ln -nfs "$prefix$a" "$(echo "$a" | cut -d/ -f5-)"
+  done
+
+  set +f
+  rm -f * 2>&- || true
+  rm -f bin/*.cmd 2>&- || true
+  for a in bin/*; do
+    if [[ -x "$a" ]]; then
+      ln -nfs ../../libexec/ec2-wrapper $a
+    fi
+  done
+  set -f
+}
+
+require sub "$BASH_SOURCE" "$@"
