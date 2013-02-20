@@ -19,6 +19,9 @@ function main {
   readonly local pth_script="$(set +f; ls -d $shome/vendor/projects/*/bin/$nm_cmd 2>&-)"
 
   if [[ -x "$pth_script" ]]; then
+    if [[ "$(basename "$pth_script")" != "ec2-cmd" ]]; then
+      logger_info "$pth_script" "$@"
+    fi
     exec $pth_script "$@"
   else
     logger_fatal "can't find actual $nm_cmd script"
