@@ -1,12 +1,21 @@
 #!/bin/bash
 
 export EC2_HOME="$shome/install"
+export AWS_CLOUDFORMATION_HOME="$shome/install"
 
 : ${JAVA_HOME:="$(/usr/libexec/java_home 2>&-)"}
 export JAVA_HOME
 
 if [[ -z "$JAVA_HOME" ]]; then
   logger_fatal "specify java install in environment variable JAVA_HOME"
+  exit 1
+fi
+
+: ${AWS_CREDENTIAL_FILE:="$shome/config/aws.txt"}
+export AWS_CREDENTIAL_FILE
+
+if [[ -z "$AWS_CREDENTIAL_FILE" ]]; then
+  logger_fatal "specify your aws keys in config/aws.txt"
   exit 1
 fi
 

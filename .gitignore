@@ -11,3 +11,4 @@
 /vendor/projects
 /config/*.yml
 /config/*.pem
+/config/*.txt
