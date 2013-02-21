@@ -21,7 +21,7 @@ function main {
 
   # ruby
   aptitude -y install build-essential ruby rdoc ri irb rubygems ruby-dev
-  gem install bundler -v 1.2.3
+  gem install bundler -v '~> 1.2.4'
 
   # basic packages
   aptitude -y install wget curl nc git rsync
