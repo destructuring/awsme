@@ -21,7 +21,7 @@ function main {
   prep_awscli
 
   bundle check 2>&1 > /dev/null || bundle --local --path vendor/bundle > /dev/null
-  bundle exec microwave -j $shome/nodes/localhost.json
+  bundle exec microwave -j <(echo '{"run_list":["awsme"]}')
 
   exec $SHELL
 }
