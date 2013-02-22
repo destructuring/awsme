@@ -2,7 +2,7 @@
 
 function main {
   # This logs the output of the user-data. http://alestic.com/2010/12/ec2-user-data-output
-  exec > >(tee /var/log/user-data.log | logger -t user-data -s 2>/dev/console) 2>&1
+  exec > >(tee /var/log/awsme.log | logger -t awsme -s 2>/dev/console) 2>&1
 
   # Stop instance before first hour, probbaly a runaway instance by then
   echo poweroff | at now + 50 minutes
