@@ -1,7 +1,8 @@
 #!/bin/bash
 
 export EC2_HOME="$shome/install"
-export AWS_CLOUDFORMATION_HOME="$shome/install"
+export AWS_CLOUDFORMATION_HOME="$(set +f; ls -d $shome/vendor/projects/AWSCloudFormation-*)"
+export AWS_AUTO_SCALING_HOME="$(set +f; ls -d $shome/vendor/projects/AutoScaling-*)"
 
 : ${JAVA_HOME:="$(/usr/libexec/java_home 2>&-)"}
 export JAVA_HOME
@@ -51,4 +52,4 @@ if [[ -z "EC2_CERT" ]]; then
   exit 1
 fi
 
-PATH="$PATH:$shome/install/bin"
+PATH="$PATH:$EC2_HOME/bin:$AWS_CLOUDFORMATION_HOME/bin:$AWS_AUTO_SCALING_HOME/bin"
