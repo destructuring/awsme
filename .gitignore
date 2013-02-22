@@ -12,3 +12,4 @@
 /config/*.yml
 /config/*.pem
 /config/*.txt
+/var

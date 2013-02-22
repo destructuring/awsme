@@ -5,8 +5,7 @@ You can set environmental variables for `JAVA_HOME`, `AWS_ACCESS_KEY`,
 project.  The scripts will set them up if necessary/possible.
 
 Credentials can also be written to `config/aws.yml`.  See
-`config/aws.yml.example` for a template.  Also see `config/aws.txt` for
-configuring  Cloud Formation.
+`config/aws.yml.example` for a template.
 
 Certificates can be stored in `config/certificate.pem` and `config/private-key.pem`.
 
