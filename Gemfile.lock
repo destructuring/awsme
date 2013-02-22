@@ -9,7 +9,7 @@ GEM
     highline (1.6.15)
     ipaddress (0.8.0)
     json (1.7.7)
-    microwave (11.400.6)
+    microwave (11.400.7)
       erubis
       highline (>= 1.6.9)
       json (>= 1.4.4, <= 1.7.7)
