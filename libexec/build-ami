@@ -36,7 +36,7 @@ function build_ami {
   fi
 
   local source_ami="$(pick_ami)"
-  COMMAND="ec2-run-instances --region $FLAGS_region -K $EC2_PRIVATE_KEY -C $EC2_CERT $source_ami -n 1 -t $FLAGS_instype --instance-initiated-shutdown-behavior stop -f $shome/libexec/ubuntu.sh $COMMAND_EXTRA"
+  COMMAND="ec2-run-instances --region $FLAGS_region -K $EC2_PRIVATE_KEY -C $EC2_CERT $source_ami -n 1 -t $FLAGS_instype --instance-initiated-shutdown-behavior stop -f "$FLAGS_bootstrap" $COMMAND_EXTRA"
 
   local tmp_run="$(mktemp -t XXXXXXXXX)"
   $COMMAND | tee "$tmp_run"
