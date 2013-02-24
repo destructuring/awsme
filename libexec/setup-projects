@@ -16,7 +16,7 @@ source "$shome/libexec/_jason"
 function main {
   cd "$shome"
   rm -rf install
-  mkdir -p install vendor/projects
+  mkdir -p install
 
   set +f
 
