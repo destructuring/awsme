@@ -15,16 +15,12 @@ function main {
   aptitude -y upgrade
   aptitude hold linux-headers linux-{,{headers,image}-}{generic,server,virtual}
 
-  # Update certs
-  aptitude -y install ca-certificates ssl-cert
-  /usr/sbin/update-ca-certificates --fresh
+  # basic packages
+  aptitude -y install wget curl nc git rsync make
 
   # ruby
-  aptitude -y install build-essential ruby rdoc ri irb rubygems ruby-dev
+  aptitude -y install build-essential ruby rdoc ri irb rubygems ruby-dev libxslt-dev libxml2-dev
   gem install bundler -v '~> 1.2.4'
-
-  # basic packages
-  aptitude -y install wget curl nc git rsync
 
   # finishing up
   aptitude clean
