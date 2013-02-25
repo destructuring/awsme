@@ -1,6 +1,7 @@
 #!/bin/bash
 
-export EC2_HOME="$shome/install"
+export EC2_HOME="$(set +f; ls -d $shome/vendor/projects/ec2-api-tools*)"
+export EC2_AMI_HOME="$(set +f; ls -d $shome/vendor/projects/ec2-ami-tools*)"
 export AWS_CLOUDFORMATION_HOME="$(set +f; ls -d $shome/vendor/projects/AWSCloudFormation-*)"
 export AWS_AUTO_SCALING_HOME="$(set +f; ls -d $shome/vendor/projects/AutoScaling-*)"
 
@@ -52,4 +53,4 @@ if [[ -z "EC2_CERT" ]]; then
   exit 1
 fi
 
-PATH="$PATH:$EC2_HOME/bin:$AWS_CLOUDFORMATION_HOME/bin:$AWS_AUTO_SCALING_HOME/bin"
+PATH="$PATH:$EC2_HOME/bin:$EC2_AMI_HOME/bin:$AWS_CLOUDFORMATION_HOME/bin:$AWS_AUTO_SCALING_HOME/bin"

@@ -9,10 +9,7 @@ Credentials can also be written to `config/aws.yml`.  See
 
 Certificates can be stored in `config/certificate.pem` and `config/private-key.pem`.
 
-The ec2 command line tools are in `install/bin` which can be added to
-your PATH.
-
 A convenient script `bin/shell` will configure all of this in a bash
-sub-shell.
+sub-shell with PATH adjusted.
 
 If everything is configured, try running `ec2ver` and `ec2din`.
