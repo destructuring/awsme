@@ -2,7 +2,7 @@ all: ready pyaws
 
 ready:
 	@git submodule update --init --recursive
-	@bundle check 2>&1 >/dev/null || { bundle --local --path vendor/path > /dev/null && bundle check; }
+	@bundle check 2>&1 >/dev/null || { bundle --local --path vendor/bundle > /dev/null && bundle check; }
 
 pyaws: .awscli/bin/aws
 	
