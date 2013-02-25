@@ -3,10 +3,11 @@
 # parse the command-line
 DEFINE_string 'region' 'us-east-1' 'AWS region' 'R'
 DEFINE_string 'disk' 'ebs' 'AWS disk type' 'B'
-DEFINE_string 'arch' 'amd64' 'AWS arch' 'A'
+DEFINE_string 'arch' 'amd64' 'AWS arch' 'a'
 DEFINE_string 'instype' 'm1.large' "AWS instance type" "T"
 DEFINE_string 'release' 'precise' 'Ubuntu release' 'U'
 DEFINE_string 'sshauth' "$HOME/.ssh/authorized_keys" 'Authorized ssh keys' 's'
+DEFINE_boolean 'sshagent' "$FLAGS_FALSE" 'Forward ssh agent' 'A'
 DEFINE_string 'bootstrap' "$shome/bootstrap/ubuntu.sh" 'Bootstrap script' 'b'
 
 function pick_ami {
@@ -14,22 +15,4 @@ function pick_ami {
   curl -s http://cloud-images.ubuntu.com/rss/${FLAGS_release}-release.xml | \
     awk '$1 ~ /^<br>/ { sub(/^<br>/, "", $0); print }' | \
     awk -v region="$FLAGS_region" -v disk="$FLAGS_disk" -v arch="$FLAGS_arch" '$1 == region && $3 == arch && $4 == disk { ami = $2 } END { print ami }'
-}
-
-function prep_awscli {
-  pushd "$shome" > /dev/null
-
-  if [[ ! -x "$shome/.awscli/bin/python" ]]; then
-    python $shome/libexec/virtualenv.py --extra-search-dir=$shome/vendor --never-download .awscli
-  fi
-
-  set +u
-  source $shome/.awscli/bin/activate
-  set -u
-
-  if [[ ! -x "$(type -P aws)" ]]; then
-    pip install --index-url=file://${shome}/vendor/cache/pip/simple awscli
-  fi
-
-  popd > /dev/null
 }

@@ -19,7 +19,12 @@ require build
 
 # entry point
 function main {
-  prep_awscli
+  local opt_ssh=
+
+  if [[ "$FLAGS_sshagent" = "$FLAGS_TRUE" ]]; then
+    opt_ssh="$opt_ssh -A"
+  fi
+
   time build_ami
 }
 
@@ -55,7 +60,7 @@ function build_ami {
           local new_status="$status"
           while [[ "$new_status" = "$status" ]]; do
             if nc -z "$status" 22; then
-              ssh -o "StrictHostKeyChecking no" ubuntu@"$status" bash -c "'while [[ ! -f /var/log/user-data.log ]]; do sleep 1; done; tail -f /var/log/user-data.log'" || true
+              ssh $opt_ssh -o "StrictHostKeyChecking no" ubuntu@"$status" bash -c "'while [[ ! -f /var/log/awsme.log ]]; do sleep 1; done; tail -f /var/log/awsme.log'" || true
               break
             else
               sleep 5

@@ -19,7 +19,12 @@ function main {
   aptitude -y install wget curl nc git rsync make
 
   # ruby
-  aptitude -y install build-essential ruby rdoc ri irb rubygems ruby-dev libxslt-dev libxml2-dev
+  aptitude -y install ruby rdoc ri irb rubygems ruby-dev 
+  aptitude -y install \
+    build-essential openssl libreadline6 libreadline6-dev curl zlib1g \
+    zlib1g-dev libssl-dev libyaml-dev libsqlite3-dev sqlite3 libxml2-dev \
+    libxslt-dev autoconf libc6-dev ncurses-dev automake libtool bison \
+    pkg-config # as recommended by rvm
   gem install bundler -v '~> 1.2.4'
 
   # finishing up
