@@ -18,7 +18,6 @@ require build
 function main {
   cd "$shome"
   make
-  bundle exec microwave -j <(dna)
   exec $SHELL
 }
 

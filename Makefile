@@ -3,6 +3,7 @@ all: ready pyaws
 ready:
 	@git submodule update --init --recursive
 	@bundle check 2>&1 >/dev/null || { bundle --local --path vendor/bundle > /dev/null && bundle check; }
+	@bundle exec microwave -j config/microwave.json
 
 pyaws: .awscli/bin/aws
 	
