@@ -7,7 +7,7 @@ else
 fi
 
 
-export EC2_HOME="$(set +f; ls -d $ASWME/vendor/projects/ec2-api-tools*)"
+export EC2_HOME="$(set +f; ls -d $AWSME/vendor/projects/ec2-api-tools*)"
 export EC2_AMI_HOME="$(set +f; ls -d $AWSME/vendor/projects/ec2-ami-tools*)"
 export AWS_CLOUDFORMATION_HOME="$(set +f; ls -d $AWSME/vendor/projects/AWSCloudFormation-*)"
 export AWS_AUTO_SCALING_HOME="$(set +f; ls -d $AWSME/vendor/projects/AutoScaling-*)"
