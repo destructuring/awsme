@@ -17,13 +17,15 @@ require build
 # entry point
 function main {
   cd "$shome"
-
-  prep_awscli
-
-  bundle check 2>&1 > /dev/null || bundle --local --path vendor/bundle > /dev/null
-  bundle exec microwave -j <(echo '{"run_list":["awsme"]}')
-
+  make
+  bundle exec microwave -j <(dna)
   exec $SHELL
+}
+
+function dna {
+  cat <<EOF
+    { "run_list": ["awsme"] }
+EOF
 }
 
 require sub "$BASH_SOURCE" "$@"
