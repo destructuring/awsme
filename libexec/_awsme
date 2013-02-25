@@ -1,9 +1,16 @@
 #!/bin/bash
 
-export EC2_HOME="$(set +f; ls -d $shome/vendor/projects/ec2-api-tools*)"
-export EC2_AMI_HOME="$(set +f; ls -d $shome/vendor/projects/ec2-ami-tools*)"
-export AWS_CLOUDFORMATION_HOME="$(set +f; ls -d $shome/vendor/projects/AWSCloudFormation-*)"
-export AWS_AUTO_SCALING_HOME="$(set +f; ls -d $shome/vendor/projects/AutoScaling-*)"
+if [[ "$#" > 0 ]]; then
+  AWSME="$1"; shift
+else
+  AWSME="$(cd -P -- "$(dirname -- "${BASH_SOURCE}")/.." && pwd -P)"
+fi
+
+
+export EC2_HOME="$(set +f; ls -d $ASWME/vendor/projects/ec2-api-tools*)"
+export EC2_AMI_HOME="$(set +f; ls -d $AWSME/vendor/projects/ec2-ami-tools*)"
+export AWS_CLOUDFORMATION_HOME="$(set +f; ls -d $AWSME/vendor/projects/AWSCloudFormation-*)"
+export AWS_AUTO_SCALING_HOME="$(set +f; ls -d $AWSME/vendor/projects/AutoScaling-*)"
 
 : ${JAVA_HOME:="$(/usr/libexec/java_home 2>&-)"}
 export JAVA_HOME
@@ -13,7 +20,7 @@ if [[ -z "$JAVA_HOME" ]]; then
   exit 1
 fi
 
-: ${AWS_CREDENTIAL_FILE:="$shome/config/aws.txt"}
+: ${AWS_CREDENTIAL_FILE:="$AWSME/config/aws.txt"}
 export AWS_CREDENTIAL_FILE
 
 if [[ -z "$AWS_CREDENTIAL_FILE" ]]; then
@@ -37,7 +44,7 @@ if [[ -z "$AWS_ACCESS_KEY" ]]; then
   exit 1
 fi
 
-: ${EC2_PRIVATE_KEY:="$shome/config/private-key.pem"}
+: ${EC2_PRIVATE_KEY:="$AWSME/config/private-key.pem"}
 export EC2_PRIVATE_KEY
 
 if [[ -z "EC2_PRIVATE_KEY" ]]; then
@@ -45,7 +52,7 @@ if [[ -z "EC2_PRIVATE_KEY" ]]; then
   exit 1
 fi
 
-: ${EC2_CERT:="$shome/config/certificate.pem"}
+: ${EC2_CERT:="$AWSME/config/certificate.pem"}
 export EC2_CERT
 
 if [[ -z "EC2_CERT" ]]; then
