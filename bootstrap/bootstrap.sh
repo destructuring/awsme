@@ -1,14 +1,6 @@
 #!/bin/bash -exfu
 
 function main {
-  local container
-
-  if [[ "$#" = 0 ]]; then
-    container="ec2" # dumb but can't figure how to pass an argument through user-data/cloud-init
-  else
-    container="$1"; shift
-  fi
-
   # This logs the output of the user-data. http://alestic.com/2010/12/ec2-user-data-output
   exec > >(tee /var/log/awsme.log | logger -t awsme -s) 2>&1
 
@@ -21,7 +13,6 @@ function main {
   aptitude update
   aptitude -y dist-upgrade
   aptitude -y upgrade
-  aptitude -y install dkms
   aptitude hold linux-headers linux-{,{headers,image}-}{generic,server,virtual}
 
   # basic packages
@@ -40,9 +31,7 @@ function main {
   aptitude clean
   atrm $(at -l | awk '{print $1}')
 
-  if [[ "$container" = "ec2" ]]; then
-    poweroff # signal the controller to bundle stopped instance
-  fi
+  poweroff
 }
 
 main "$@"
