@@ -1,15 +1,16 @@
-#!/bin/bash
+#!/bin/bash -exfu
 
+set -x
 bundle exec vagrant destroy -f
 
 ln -nfs bootstrap/bootstrap.sh vagrant.sh
 bundle exec vagrant up
 
 ln -nfs bootstrap/guest_additions.sh vagrant.sh
-sleep 5
+sleep 10
 bundle exec vagrant up
 
-ln -nfs bootstrap/finished.sh microwave.sh
-sleep 5
+ln -nfs bootstrap/finished.sh vagrant.sh
+sleep 10
 bundle exec vagrant up
 bundle exec vagrant ssh
