@@ -28,19 +28,36 @@ function main {
   time build_vagrant
 }
 
+function wait_for {
+  local wanted="$1"; shift
+
+  while true; do
+    local current_state="$(vbox_state "$id_instance")"
+    if [[ "$current_state" = "$wanted" ]]; then
+      echo
+      break
+    fi
+    echo "."
+    sleep 5
+  done
+}
+
 function build_vagrant {
   bundle exec vagrant destroy -f
-
   ln -nfs bootstrap/bootstrap.sh vagrant.sh
   bundle exec vagrant up
 
+  local id_instance="$(bundle exec ruby -e 'require "json"; puts JSON.load(File.read(".vagrant"))["active"]["default"]')"
+
+  wait_for "poweroff"
   ln -nfs bootstrap/guest_additions.sh vagrant.sh
-  sleep 10 # TODO better polling
   bundle exec vagrant up
 
+  wait_for "poweroff"
   ln -nfs bootstrap/finished.sh vagrant.sh
-  sleep 10 # TODO better polling
   bundle exec vagrant up
+
+  wait_for "running"
   bundle exec vagrant ssh
 
   rm -f vagrant.sh

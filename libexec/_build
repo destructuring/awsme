@@ -16,3 +16,9 @@ function pick_ami {
     awk '$1 ~ /^<br>/ { sub(/^<br>/, "", $0); print }' | \
     awk -v region="$FLAGS_region" -v disk="$FLAGS_disk" -v arch="$FLAGS_arch" '$1 == region && $3 == arch && $4 == disk { ami = $2 } END { print ami }'
 }
+
+function vbox_state {
+  local id_instance="$1"; shift
+
+  VBoxManage showvminfo "$id_instance" --machinereadable | awk '$1 ~ /^VMState=/ { split($1,a,"="); split(a[2],b,"\""); print b[2] }'
+}
