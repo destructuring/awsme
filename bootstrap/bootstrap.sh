@@ -16,7 +16,7 @@ function main {
   aptitude hold linux-headers linux-{,{headers,image}-}{generic,server,virtual}
 
   # basic packages
-  aptitude -y install wget curl nc git rsync make
+  aptitude -y install wget curl netcat git rsync make
 
   # ruby
   aptitude -y install ruby rdoc ri irb rubygems ruby-dev 
