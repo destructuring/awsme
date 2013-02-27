@@ -13,3 +13,7 @@
 /config/*.pem
 /config/*.txt
 /var
+/.vagrant
+/vagrant.sh
+/precise
+/VBoxGuestAdditions.iso

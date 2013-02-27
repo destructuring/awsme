@@ -12,7 +12,7 @@ function main {
   sh /mnt/VBoxLinuxAdditions.run
   umount /mnt
 
-  reboot
+  poweroff
 }
 
 main "$@"

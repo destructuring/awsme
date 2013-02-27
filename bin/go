@@ -1,0 +1,15 @@
+#!/bin/bash
+
+bundle exec vagrant destroy -f
+
+ln -nfs bootstrap/bootstrap.sh vagrant.sh
+bundle exec vagrant up
+
+ln -nfs bootstrap/guest_additions.sh vagrant.sh
+sleep 5
+bundle exec vagrant up
+
+ln -nfs bootstrap/finished.sh microwave.sh
+sleep 5
+bundle exec vagrant up
+bundle exec vagrant ssh
