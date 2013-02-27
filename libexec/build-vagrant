@@ -42,7 +42,21 @@ function wait_for {
   done
 }
 
+function port_for {
+  local wanted="$1"; shift
+
+  while true; do
+    if nc -z "localhost" "$wanted"; then
+      echo
+      break
+    fi
+    echo "."
+    sleep 5
+  done
+}
+
 function build_vagrant {
+  touch vagrant.sh
   bundle exec vagrant destroy -f
   ln -nfs bootstrap/bootstrap.sh vagrant.sh
   bundle exec vagrant up
@@ -58,6 +72,7 @@ function build_vagrant {
   bundle exec vagrant up
 
   wait_for "running"
+  port_for "$(VBoxManage showvminfo "$id_instance" --machinereadable | awk '$1 ~ /^Forwarding\(.*?,22"/ { split($1,a,","); print a[4] }')"
   bundle exec vagrant ssh
 
   rm -f vagrant.sh
