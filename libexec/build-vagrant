@@ -1,0 +1,49 @@
+#!/bin/bash
+
+#/ NAME
+#/     build vagrant -- builds a vagrant box
+#/
+#/ SYNOPSIS
+#/   bin/build vagrant
+#/
+#/ EXAMPLES
+#/     $ bin/build vagrant
+
+# figure out the project root under which bin, lib live
+shome="$(cd -P -- "$(dirname -- "$BASH_SOURCE")/.." && pwd -P)"
+
+# load a jason bourne library
+source "$shome/libexec/_jason"
+require awsme
+require build
+
+# entry point
+function main {
+  local opt_ssh=
+
+  if [[ "$FLAGS_sshagent" = "$FLAGS_TRUE" ]]; then
+    opt_ssh="$opt_ssh -A"
+  fi
+
+  time build_vagrant
+}
+
+function build_vagrant {
+  bundle exec vagrant destroy -f
+
+  ln -nfs bootstrap/bootstrap.sh vagrant.sh
+  bundle exec vagrant up
+
+  ln -nfs bootstrap/guest_additions.sh vagrant.sh
+  sleep 10 # TODO better polling
+  bundle exec vagrant up
+
+  ln -nfs bootstrap/finished.sh vagrant.sh
+  sleep 10 # TODO better polling
+  bundle exec vagrant up
+  bundle exec vagrant ssh
+
+  rm -f vagrant.sh
+}
+
+require sub "$BASH_SOURCE" "$@"
