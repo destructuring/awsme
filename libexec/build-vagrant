@@ -67,6 +67,8 @@ function clean_vm {
 function build_vagrant {
   cd $shome
 
+  local id_instance
+
   bundle exec vagrant box remove awsme || true
   bundle exec vagrant box add awsme boxes/precise-server-cloudimg-amd64-vagrant-disk1.box
   clean_vm
@@ -75,7 +77,7 @@ function build_vagrant {
   ln -nfs bootstrap/bootstrap.sh vagrant.sh
   bundle exec vagrant up
 
-  local id_instance="$(bundle exec ruby -e 'require "json"; puts JSON.load(File.read(".vagrant"))["active"]["default"]')"
+  id_instance="$(bundle exec ruby -e 'require "json"; puts JSON.load(File.read(".vagrant"))["active"]["default"]')"
 
   until_vm "poweroff"
 
@@ -98,8 +100,9 @@ function build_vagrant {
 
   # boot up new box
   bundle exec vagrant up
+  id_instance="$(bundle exec ruby -e 'require "json"; puts JSON.load(File.read(".vagrant"))["active"]["default"]')"
   until_vm "running"
-  until_port_open "$(forwarded_ssh_port)"
+  time until_port_open "$(forwarded_ssh_port)"
   bundle exec vagrant ssh
 }
 
