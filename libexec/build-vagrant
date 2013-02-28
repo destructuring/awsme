@@ -28,7 +28,7 @@ function main {
   time build_vagrant
 }
 
-function wait_for {
+function until_vm {
   local wanted="$1"; shift
 
   while true; do
@@ -42,7 +42,7 @@ function wait_for {
   done
 }
 
-function port_for {
+function until_port_open {
   local wanted="$1"; shift
 
   while true; do
@@ -55,27 +55,46 @@ function port_for {
   done
 }
 
-function build_vagrant {
-  touch vagrant.sh
+function forwarded_ssh_port {
+  VBoxManage showvminfo "$id_instance" --machinereadable | awk '$1 ~ /^Forwarding\(.*?,22"/ { split($1,a,","); print a[4] }'
+}
+
+function clean_vm {
+  touch $shome/vagrant.sh
   bundle exec vagrant destroy -f
+  rm -f $shome/vagrant.sh
+}
+
+function build_vagrant {
+  cd $shome
+
+  clean_vm
+
+  # bootstrap
   ln -nfs bootstrap/bootstrap.sh vagrant.sh
   bundle exec vagrant up
 
   local id_instance="$(bundle exec ruby -e 'require "json"; puts JSON.load(File.read(".vagrant"))["active"]["default"]')"
 
-  wait_for "poweroff"
+  # guest additions
+  until_vm "poweroff"
   ln -nfs bootstrap/guest_additions.sh vagrant.sh
   bundle exec vagrant up
 
-  wait_for "poweroff"
+  # finished
+  until_vm "poweroff"
   ln -nfs bootstrap/finished.sh vagrant.sh
   bundle exec vagrant up
 
-  wait_for "running"
-  port_for "$(VBoxManage showvminfo "$id_instance" --machinereadable | awk '$1 ~ /^Forwarding\(.*?,22"/ { split($1,a,","); print a[4] }')"
-  bundle exec vagrant ssh
+  # bundling
+  until_vm "running"
+  until_port_open "$(forwarded_ssh_port)"
+  bundle exec vagrant package
+  mv package.box awsme.box
+  bundle exec vagrant box remove awsme || true
+  bundle exec vagrant box add awsme awsme.box
 
-  rm -f vagrant.sh
+  clean_vm
 }
 
 require sub "$BASH_SOURCE" "$@"
