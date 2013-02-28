@@ -90,9 +90,9 @@ function build_vagrant {
   until_vm "running"
   until_port_open "$(forwarded_ssh_port)"
   bundle exec vagrant package
-  mv package.box awsme.box
+  mv package.box boxes/awsme.box
   bundle exec vagrant box remove awsme || true
-  bundle exec vagrant box add awsme awsme.box
+  bundle exec vagrant box add awsme boxes/awsme.box
 
   clean_vm
 

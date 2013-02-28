@@ -1,7 +1,7 @@
 #!/bin/bash -exfu
 
 function main {
-  cp /vagrant/VBoxGuestAdditions.iso ~/
+  cp /vagrant/boxes/VBoxGuestAdditions.iso ~/
 
   export DEBIAN_FRONTEND="noninteractive"
 
@@ -13,6 +13,7 @@ function main {
   mount -o loop ~/VBoxGuestAdditions.iso /mnt
   sh /mnt/VBoxLinuxAdditions.run
   umount /mnt
+  rm -f ~/VBoxGuestAdditions.iso
 
   echo "dhclient eth1" > /etc/rc.local
   poweroff
