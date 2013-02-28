@@ -1,0 +1,11 @@
+Vagrant::Config.run do |config|
+  config.vm.box = "<%= node[:vagrant][:box] %>"
+  config.vm.base_mac = "<%= node[:vagrant][:base_mac] %>"
+  Vagrant::Config.run do |config|
+    <% if node[:vagrant][:provision] && node[:vagrant][:provision][:shell] %>
+      config.vm.provision :shell, :path => "<%= node[:vagrant][:provision][:shell][:path] %>"
+    <% end %>
+  end
+end
+
+# vi: set ft=ruby :

@@ -60,8 +60,6 @@ function forwarded_ssh_port {
 }
 
 function clean_vm {
-  touch $shome/vagrant.sh
-  bundle exec vagrant destroy -f
 }
 
 function build_vagrant {
@@ -69,12 +67,12 @@ function build_vagrant {
 
   local id_instance
 
-  bundle exec vagrant box remove awsme || true
-  bundle exec vagrant box add awsme boxes/precise-server-cloudimg-amd64-vagrant-disk1.box
-  clean_vm
+  bundle exec vagrant box add precise-server-cloudimg-amd64 boxes/precise-server-cloudimg-amd64-vagrant-disk1.box || true
+  bundle exec microwave -j <(echo '{"run_list": ["vagrant"], "vagrant": { "box": "precise-server-cloudimg-amd64" }}')
+  bundle exec vagrant destroy -f
 
   # bootstrap
-  ln -nfs bootstrap/bootstrap.sh vagrant.sh
+  bundle exec microwave -j <(echo '{"run_list": ["vagrant"], "vagrant": { "box": "precise-server-cloudimg-amd64", "provision": { "shell": { "path": "bootstrap/bootstrap.sh" }}}}')
   bundle exec vagrant up
 
   id_instance="$(bundle exec ruby -e 'require "json"; puts JSON.load(File.read(".vagrant"))["active"]["default"]')"
@@ -82,12 +80,13 @@ function build_vagrant {
   until_vm "poweroff"
 
   # guest additions
-  ln -nfs bootstrap/guest_additions.sh vagrant.sh
+  bundle exec microwave -j <(echo '{"run_list": ["vagrant"], "vagrant": { "box": "precise-server-cloudimg-amd64", "provision": { "shell": { "path": "bootstrap/guest_additions.sh" }}}}')
   bundle exec vagrant up
   until_vm "poweroff"
 
   # bundling
   ln -nfs bootstrap/finished.sh vagrant.sh
+  bundle exec microwave -j <(echo '{"run_list": ["vagrant"], "vagrant": { "box": "precise-server-cloudimg-amd64", "provision": { "shell": { "path": "bootstrap/finished.sh" }}}}')
   bundle exec vagrant up
   until_vm "running"
   until_port_open "$(forwarded_ssh_port)"
@@ -95,10 +94,10 @@ function build_vagrant {
   mv package.box boxes/awsme.box
   bundle exec vagrant box remove awsme || true
   bundle exec vagrant box add awsme boxes/awsme.box
-
-  clean_vm
+  bundle exec vagrant destroy -f
 
   # boot up new box
+  bundle exec microwave -j <(echo '{"run_list": ["vagrant"], "vagrant": { "box": "awsme" }}')
   bundle exec vagrant up
   id_instance="$(bundle exec ruby -e 'require "json"; puts JSON.load(File.read(".vagrant"))["active"]["default"]')"
   until_vm "running"
