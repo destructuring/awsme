@@ -59,9 +59,6 @@ function forwarded_ssh_port {
   VBoxManage showvminfo "$id_instance" --machinereadable | awk '$1 ~ /^Forwarding\(.*?,22"/ { split($1,a,","); print a[4] }'
 }
 
-function clean_vm {
-}
-
 function build_vagrant {
   cd $shome
 
@@ -85,7 +82,6 @@ function build_vagrant {
   until_vm "poweroff"
 
   # bundling
-  ln -nfs bootstrap/finished.sh vagrant.sh
   bundle exec microwave -j <(echo '{"run_list": ["vagrant"], "vagrant": { "box": "precise-server-cloudimg-amd64", "provision": { "shell": { "path": "bootstrap/finished.sh" }}}}')
   bundle exec vagrant up
   until_vm "running"

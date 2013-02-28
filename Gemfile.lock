@@ -56,6 +56,8 @@ GEM
     rest-client (1.6.7)
       mime-types (>= 1.16)
     systemu (2.5.2)
+    tvd-vagrant (0.0.2)
+      microwave
     uuidtools (2.1.3)
     vagrant (1.0.6)
       archive-tar-minitar (= 0.5.2)
@@ -73,5 +75,5 @@ PLATFORMS
 
 DEPENDENCIES
   aws-sdk
-  microwave
+  tvd-vagrant
   vagrant (= 1.0.6)
