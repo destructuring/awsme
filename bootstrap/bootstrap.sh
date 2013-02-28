@@ -20,11 +20,8 @@ function main {
 
   # ruby
   aptitude -y install ruby rdoc ri irb rubygems ruby-dev 
-  aptitude -y install \
-    build-essential openssl libreadline6 libreadline6-dev curl zlib1g \
-    zlib1g-dev libssl-dev libyaml-dev libsqlite3-dev sqlite3 libxml2-dev \
-    libxslt-dev autoconf libc6-dev ncurses-dev automake libtool bison \
-    pkg-config # as recommended by rvm
+  aptitude -y install build-essential curl zlib1g-dev libreadline-gplv2-dev \
+                      libxml2-dev libsqlite3-dev file git bison adduser # ruby-rvm package dependencies
   gem install bundler --no-ri --no-rdoc -v '~> 1.2.5'
 
   # finishing up
