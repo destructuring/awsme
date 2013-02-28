@@ -1,10 +1,12 @@
 #!/bin/bash -exfu
 
 function main {
+  cp /vagrant/VBoxGuestAdditions.iso ~/
+
   export DEBIAN_FRONTEND="noninteractive"
 
-  cp /vagrant/VBoxGuestAdditions.iso ~/
   aptitude purge -y virtualbox-guest-{dkms,utils,x11}
+  aptitude purge -y cloud-init
   aptitude install -q -y dkms
   aptitude clean
 
@@ -12,6 +14,7 @@ function main {
   sh /mnt/VBoxLinuxAdditions.run
   umount /mnt
 
+  echo "dhclient eth1" > /etc/rc.local
   poweroff
 }
 

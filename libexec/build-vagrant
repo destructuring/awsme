@@ -62,12 +62,13 @@ function forwarded_ssh_port {
 function clean_vm {
   touch $shome/vagrant.sh
   bundle exec vagrant destroy -f
-  rm -f $shome/vagrant.sh
 }
 
 function build_vagrant {
   cd $shome
 
+  bundle exec vagrant box remove awsme || true
+  bundle exec vagrant box add awsme boxes/precise-server-cloudimg-amd64-vagrant-disk1.box
   clean_vm
 
   # bootstrap
@@ -76,17 +77,16 @@ function build_vagrant {
 
   local id_instance="$(bundle exec ruby -e 'require "json"; puts JSON.load(File.read(".vagrant"))["active"]["default"]')"
 
-  # guest additions
   until_vm "poweroff"
+
+  # guest additions
   ln -nfs bootstrap/guest_additions.sh vagrant.sh
   bundle exec vagrant up
-
-  # finished
   until_vm "poweroff"
-  ln -nfs bootstrap/finished.sh vagrant.sh
-  bundle exec vagrant up
 
   # bundling
+  ln -nfs bootstrap/finished.sh vagrant.sh
+  bundle exec vagrant up
   until_vm "running"
   until_port_open "$(forwarded_ssh_port)"
   bundle exec vagrant package
@@ -95,6 +95,12 @@ function build_vagrant {
   bundle exec vagrant box add awsme awsme.box
 
   clean_vm
+
+  # boot up new box
+  bundle exec vagrant up
+  until_vm "running"
+  until_port_open "$(forwarded_ssh_port)"
+  bundle exec vagrant ssh
 }
 
 require sub "$BASH_SOURCE" "$@"
