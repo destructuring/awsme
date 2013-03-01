@@ -7,7 +7,11 @@ fi
 __meat__='y'
 
 if [[ -z "${shome:-}" ]]; then
+<<<<<<< HEAD
   shome="$(cd -P -- "$(dirname -- "${BASH_SOURCE}")/.." && pwd -P)"
+=======
+  shome="$(unset CDPATH; cd -P -- "$(dirname -- "${BASH_SOURCE}")/.." && pwd -P)"
+>>>>>>> rb/master
 fi
 
 function get_started {
@@ -60,6 +64,7 @@ function display_synopsis {
 
 function which_library {
   local library="$1"; shift
+<<<<<<< HEAD
   if [[ -r "$shome/bin/_$library" ]]; then
     echo "$shome/bin/_$library"
   elif [[ -r "$shome/libexec/_$library" ]]; then
@@ -70,13 +75,23 @@ function which_library {
     echo "$shome/.$library/libexec/_profile"
   elif [[ -r "$shome/.$library/.profile" ]]; then
     echo "$shome/.$library/.profile"
+=======
+  if [[ -r "$shome/libexec/_$library" ]]; then
+    echo "$shome/libexec/_$library"
+  elif [[ -r "$shome/.$library/libexec/_$library" ]]; then
+    echo "$shome/.$library/libexec/_$library"
+>>>>>>> rb/master
   else
     local nm_library="${library%%/*}"
     if [[ "$nm_library" != "$library" ]]; then
       local nm_right="${library##*/}"
+<<<<<<< HEAD
       if [[ -r "$shome/.$nm_library/bin/_$nm_right" ]]; then
         echo "$shome/.$nm_library/bin/_$nm_right"
       elif [[ -r "$shome/.$nm_library/libexec/_$nm_right" ]]; then
+=======
+      if [[ -r "$shome/.$nm_library/libexec/_$nm_right" ]]; then
+>>>>>>> rb/master
         echo "$shome/.$nm_library/libexec/_$nm_right"
       fi
     fi
@@ -151,7 +166,7 @@ function runmany {
 
 function _main {
   if [[ -z "$shome" ]]; then
-    shome="$(cd -P -- "$(dirname -- "${BASH_SOURCE}")/.." && pwd -P)"
+    shome="$(unset CDPATH; cd -P -- "$(dirname -- "${BASH_SOURCE}")/.." && pwd -P)"
   fi
 
   require 'shflags'
