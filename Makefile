@@ -2,8 +2,11 @@ all: ready pyaws
 
 ready: config/aws.yml
 	@git submodule update --init --recursive
-	@bundle check 2>&1 >/dev/null || { bundle --local --path vendor/bundle > /dev/null && bundle check; }
+	@bundle check 2>&1 >/dev/null || { bundle --no-prune --local --path vendor/bundle 2>&1 > /dev/null || bundle check; }
 	@bundle exec microwave -j config/microwave.json
+
+vagrant:
+	@cd vendor/cache/vagrant; bundle check 2>&1 >/dev/null || { bundle --no-prune --local --path vendor/bundle 2>&1 > /dev/null ||  bundle check; }
 
 pyaws: .awscli/bin/aws
 	

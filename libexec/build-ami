@@ -19,6 +19,10 @@ require build
 
 # entry point
 function main {
+  cd $shome
+
+  make
+
   local opt_ssh=
 
   if [[ "$FLAGS_sshagent" = "$FLAGS_TRUE" ]]; then
