@@ -72,7 +72,7 @@ function build_vagrant {
   id_instance="$(bexec ruby -e 'require "json"; puts JSON.load(File.read(".vagrant"))["active"]["default"]')"
   until_vbox "running"
   time until_port_open localhost "$(forwarded_ssh_port)"
-  bexec vagrant ssh
+  bexec vagrant ssh -- -l ubuntu
 }
 
 require sub "$BASH_SOURCE" "$@"
