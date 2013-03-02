@@ -8,11 +8,7 @@
 #/     publish site # defaults to output . gh-pages .
 
 # figure out the project root under which bin, lib live
-<<<<<<< HEAD
-shome="$(cd -P -- "$(dirname -- "$BASH_SOURCE")/.." && pwd -P)"
-=======
 shome="$(unset CDPATH; cd -P -- "$(dirname -- "$BASH_SOURCE")/.." && pwd -P)"
->>>>>>> rb/master
 
 # load a jason bourne library
 source "$shome/libexec/_jason"
@@ -20,18 +16,10 @@ source "$shome/libexec/_jason"
 # define command line options:
 DEFINE_boolean "clean" "$FLAGS_FALSE" "delete destination branch contents"
 DEFINE_string "message" "published $(date)" "commit message for published content" "m"
-<<<<<<< HEAD
-
-# entry point
-function main {
-  set -x
-
-=======
 DEFINE_boolean "force" "$FLAGS_FALSE" "force push to remote" "f"
 
 # entry point
 function main {
->>>>>>> rb/master
   if [[ "$#" = 0 ]]; then
     local src_dir="output"
   else
