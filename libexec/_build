@@ -22,3 +22,31 @@ function vbox_state {
 
   VBoxManage showvminfo "$id_instance" --machinereadable | awk '$1 ~ /^VMState=/ { split($1,a,"="); split(a[2],b,"\""); print b[2] }'
 }
+
+function until_port_open {
+  local address="$1"; shift
+  local port="$1"; shift
+
+  while true; do
+    if nc -z "$address" "$port"; then
+      echo
+      break
+    fi
+    echo "."
+    sleep 5
+  done
+}
+
+function until_vbox {
+  local wanted="$1"; shift
+
+  while true; do
+    local current_state="$(vbox_state "$id_instance")"
+    if [[ "$current_state" = "$wanted" ]]; then
+      echo
+      break
+    fi
+    echo "."
+    sleep 5
+  done
+}

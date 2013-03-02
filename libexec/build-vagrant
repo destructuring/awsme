@@ -28,33 +28,6 @@ function main {
   time build_vagrant
 }
 
-function until_vm {
-  local wanted="$1"; shift
-
-  while true; do
-    local current_state="$(vbox_state "$id_instance")"
-    if [[ "$current_state" = "$wanted" ]]; then
-      echo
-      break
-    fi
-    echo "."
-    sleep 5
-  done
-}
-
-function until_port_open {
-  local wanted="$1"; shift
-
-  while true; do
-    if nc -z "localhost" "$wanted"; then
-      echo
-      break
-    fi
-    echo "."
-    sleep 5
-  done
-}
-
 function forwarded_ssh_port {
   VBoxManage showvminfo "$id_instance" --machinereadable | awk '$1 ~ /^Forwarding\(.*?,22"/ { split($1,a,","); print a[4] }'
 }
@@ -72,7 +45,7 @@ function build_vagrant {
   bundle exec microwave -j <(echo '{"run_list": ["vagrant"], "vagrant": { "box": "precise-server-cloudimg-amd64", "provision": { "shell": { "path": "bootstrap/bootstrap.sh" }}}}')
   bundle exec vagrant up
   id_instance="$(bundle exec ruby -e 'require "json"; puts JSON.load(File.read(".vagrant"))["active"]["default"]')"
-  until_vm "poweroff"
+  until_vbox "poweroff"
 
   # guest additions
   bundle exec microwave -j <(echo '{"run_list": ["vagrant"], "vagrant": { "box": "precise-server-cloudimg-amd64", "provision": { "shell": { "path": "bootstrap/guest_additions.sh" }}}}')
@@ -91,8 +64,8 @@ function build_vagrant {
   bundle exec microwave -j <(echo '{"run_list": ["vagrant"], "vagrant": { "box": "awsme" }}')
   bundle exec vagrant up
   id_instance="$(bundle exec ruby -e 'require "json"; puts JSON.load(File.read(".vagrant"))["active"]["default"]')"
-  until_vm "running"
-  time until_port_open "$(forwarded_ssh_port)"
+  until_vbox "running"
+  time until_port_open localhost "$(forwarded_ssh_port)"
   bundle exec vagrant ssh
 }
 
