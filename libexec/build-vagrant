@@ -71,21 +71,16 @@ function build_vagrant {
   # bootstrap
   bundle exec microwave -j <(echo '{"run_list": ["vagrant"], "vagrant": { "box": "precise-server-cloudimg-amd64", "provision": { "shell": { "path": "bootstrap/bootstrap.sh" }}}}')
   bundle exec vagrant up
-
   id_instance="$(bundle exec ruby -e 'require "json"; puts JSON.load(File.read(".vagrant"))["active"]["default"]')"
-
   until_vm "poweroff"
 
   # guest additions
   bundle exec microwave -j <(echo '{"run_list": ["vagrant"], "vagrant": { "box": "precise-server-cloudimg-amd64", "provision": { "shell": { "path": "bootstrap/guest_additions.sh" }}}}')
   bundle exec vagrant up
-  until_vm "poweroff"
 
   # bundling
   bundle exec microwave -j <(echo '{"run_list": ["vagrant"], "vagrant": { "box": "precise-server-cloudimg-amd64", "provision": { "shell": { "path": "bootstrap/finished.sh" }}}}')
-  bundle exec vagrant up
-  until_vm "running"
-  until_port_open "$(forwarded_ssh_port)"
+  bundle exec vagrant provision
   bundle exec vagrant package
   mv package.box boxes/awsme.box
   bundle exec vagrant box remove awsme || true
