@@ -50,3 +50,62 @@ function until_vbox {
     sleep 5
   done
 }
+
+function while_ec2 {
+  logger_info "while $@"
+  while true; do
+    local status="$(instance_status)"
+
+    local wanted
+    for wanted in "$@"; do
+      if [[ "$status" = "$wanted" ]]; then
+        echo -n "."
+        sleep 5
+        continue 2
+      fi
+    done
+
+    break
+  done
+  
+  echo
+}
+
+function until_ec2 {
+  logger_info "waiting for $@"
+  while true; do
+    local status="$(instance_status)"
+
+    local wanted
+    for wanted in "$@"; do
+      if [[ "$status" = "$wanted" ]]; then
+        break 2
+      fi
+    done
+    echo -n "."
+    sleep 5
+  done
+
+  echo
+}
+
+function until_ami {
+  logger_info "waiting for $@"
+
+  local id_ami="$1"; shift
+
+  while true; do
+    local status="$(image_status "$id_ami")"
+
+    local wanted
+    for wanted in "$@"; do
+      if [[ "$status" = "$wanted" ]]; then
+        break 2
+      fi
+    done
+    echo -n "."
+    sleep 5
+  done
+
+  echo
+}

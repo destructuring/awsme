@@ -28,57 +28,107 @@ function main {
   time build_ami
 }
 
-function build_ami {
-  # Build AMI
-  local COMMAND_EXTRA=
-  
-  local nm_keypair="tmp-build-ami-keypair-$(date +%s)-$$"
-  if [[ -f "$FLAGS_sshauth" ]]; then
-    ec2-import-keypair --region $FLAGS_region --public-key-file $FLAGS_sshauth $nm_keypair
-    COMMAND_EXTRA="-k $nm_keypair $COMMAND_EXTRA"
+function instance_status {
+  ec2-describe-instances --region "$FLAGS_region" "$id_instance" | awk '$1 == "INSTANCE" { print $4 }'
+}
+
+function image_status {
+  ec2-describe-images --region "$FLAGS_region" "$id_image" | awk '$1 == "IMAGE" { print $5 }'
+}
+
+function run_ubuntu_base {
+  local bootstrap=
+
+  if [[ "$#" = 0 ]]; then
+    bootstrap="$FLAGS_bootstrap"
   else
-    COMMAND_EXTRA="-k default $COMMAND_EXTRA"
+    bootstrap="$1"; shift
   fi
 
   local source_ami="$(pick_ami)"
-  COMMAND="ec2-run-instances --region $FLAGS_region -K $EC2_PRIVATE_KEY -C $EC2_CERT $source_ami -n 1 -t $FLAGS_instype --instance-initiated-shutdown-behavior stop -f "$FLAGS_bootstrap" $COMMAND_EXTRA"
-
   local tmp_run="$(mktemp -t XXXXXXXXX)"
-  $COMMAND | tee "$tmp_run"
-  local INSTANCE_ID="$(awk '$1 == "INSTANCE" {print $2}' "$tmp_run")"
+  ec2-run-instances --region $FLAGS_region -K $EC2_PRIVATE_KEY -C $EC2_CERT $source_ami -n 1 -t $FLAGS_instype --instance-initiated-shutdown-behavior stop -f "$FLAGS_bootstrap" $opt_ec2 > "$tmp_run"
+  cat "$tmp_run" 1>&2
+  local id_instance="$(awk '$1 == "INSTANCE" {print $2}' "$tmp_run")"
   rm -f "$tmp_run"
 
-  if [[ -n "$INSTANCE_ID" ]]; then
-    local status="$(ec2din --region "$FLAGS_region" "$INSTANCE_ID" | awk '$1 == "INSTANCE" { print $4 }')"
-    local last_status
-    while [[ "$status" != "stopped" && "$status" != "terminated" ]]; do
-      if [[ "$status" != "$last_status" ]]; then
-        echo "status: $status"
-        last_status="$status"
+  echo "$id_instance"
+}
 
-        if [[ "$status" != "pending" ]]; then
-          local new_status="$status"
-          while [[ "$new_status" = "$status" ]]; do
-            if nc -z "$status" 22; then
-              ssh $opt_ssh -o "StrictHostKeyChecking no" ubuntu@"$status" bash -c "'while [[ ! -f /var/log/awsme.log ]]; do sleep 1; done; tail -f /var/log/awsme.log'" || true
-              break
-            else
-              sleep 5
-              new_status="$(ec2din --region "$FLAGS_region" "$INSTANCE_ID" | awk '$1 == "INSTANCE" { print $4 }')"
-            fi
-          done
-        fi
-      fi
-      sleep 5
-      status="$(ec2din --region "$FLAGS_region" "$INSTANCE_ID" | awk '$1 == "INSTANCE" { print $4 }')"
-    done
+function run_clean_base {
+  local source_ami="$1"; shift
 
-    AMI_NAME=`date "+base_%Y-%m-%d-%H-%M"`
-    ec2cim --region "$FLAGS_region" -K $EC2_PRIVATE_KEY -C $EC2_CERT -n $AMI_NAME $INSTANCE_ID
-    ec2-terminate-instances --region "$FLAGS_region" $INSTANCE_ID
-    if [[ -f "$FLAGS_sshauth" ]]; then
-      ec2-delete-keypair --region $FLAGS_region $nm_keypair
-    fi
+  local tmp_run="$(mktemp -t XXXXXXXXX)"
+  ec2-run-instances --region $FLAGS_region -K $EC2_PRIVATE_KEY -C $EC2_CERT $source_ami -n 1 -t $FLAGS_instype $opt_ec2 > "$tmp_run"
+  cat "$tmp_run" 1>&2
+  local id_instance="$(awk '$1 == "INSTANCE" {print $2}' "$tmp_run")"
+  rm -f "$tmp_run"
+
+  echo "$id_instance"
+}
+
+function build_ami {
+  local opt_ec2=
+  
+  # build keypair
+  local nm_keypair="tmp-build-ami-keypair-$(date +%s)-$$"
+  if [[ -f "$FLAGS_sshauth" ]]; then
+    ec2-import-keypair --region $FLAGS_region --public-key-file $FLAGS_sshauth $nm_keypair
+    opt_ec2="-k $nm_keypair $opt_ec2"
+  else
+    opt_ec2="-k default $opt_ec2"
+  fi
+
+  # run instance
+  local id_instance="$(run_ubuntu_base)"
+  if [[ -z "$id_instance" ]]; then
+    logger_fatal "could not find instance id"
+    return 1
+  fi
+
+  # go from pending -> $hostname
+  while_ec2 "pending"
+
+  # wait for ssh to watch logs
+  local hst_instance="$(instance_status)"
+  until_port_open "$hst_instance" 22
+  ssh $opt_ssh -o "StrictHostKeyChecking no" ubuntu@"$hst_instance" bash -c "'while [[ ! -f /var/log/awsme.log ]]; do sleep 1; done; tail -f /var/log/awsme.log'" || true
+    
+  # wait for script to finish
+  until_ec2 "stopped" "terminated"
+
+  # detect early termination
+  local status="$(instance_status)"
+  if [[ "$status" = "terminated" ]]; then
+  logger_fatal "Instance terminated after bootstrap, expecting stopped"
+    return 1
+  fi
+
+  # bundle ami
+  local nm_ami=`date "+base_%Y-%m-%d-%H-%M"`
+  local id_image="$(ec2-create-image --region "$FLAGS_region" -K $EC2_PRIVATE_KEY -C $EC2_CERT -n $nm_ami $id_instance | awk '$1 == "IMAGE" {print $2}')"
+  ec2-terminate-instances --region "$FLAGS_region" $id_instance
+  until_ami "$id_image" available
+
+  # run the new ami
+  id_instance="$(run_clean_base "$id_image")"
+  if [[ -z "$id_instance" ]]; then
+    logger_fatal "could not find instance id"
+    return 1
+  fi
+
+  # go from pending -> $hostname
+  while_ec2 "pending"
+  
+  # wait for ssh
+  local hst_instance="$(instance_status)"
+  until_port_open "$hst_instance" 22
+  ssh $opt_ssh -o "StrictHostKeyChecking no" ubuntu@"$hst_instance" || true
+  ec2-terminate-instances --region "$FLAGS_region" $id_instance
+
+  # cleanup
+  if [[ -f "$FLAGS_sshauth" ]]; then
+    ec2-delete-keypair --region $FLAGS_region $nm_keypair
   fi
 }
 
