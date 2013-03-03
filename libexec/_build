@@ -58,7 +58,7 @@ function while_ec2 {
 
     local wanted
     for wanted in "$@"; do
-      if [[ "$status" = "$wanted" ]]; then
+      if [[ "$status" = "$wanted" || -z "$status" ]]; then
         echo -n "."
         sleep 5
         continue 2
