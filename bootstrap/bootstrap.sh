@@ -18,6 +18,9 @@ function main {
   # basic packages
   aptitude -y install wget curl netcat git rsync make
 
+  # unecessary daemons
+  aptitude -y purge whoopsie acpid
+
   # ruby
   aptitude -y install ruby rdoc ri irb rubygems ruby-dev 
   aptitude -y install build-essential curl zlib1g-dev libreadline-gplv2-dev \
