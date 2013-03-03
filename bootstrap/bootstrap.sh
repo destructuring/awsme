@@ -19,7 +19,7 @@ function main {
   aptitude -y install wget curl netcat git rsync make
 
   # unecessary daemons
-  aptitude -y purge whoopsie acpid
+  aptitude -y purge whoopsie acpid nfs-common rpcbind
 
   # ruby
   aptitude -y install ruby rdoc ri irb rubygems ruby-dev 
