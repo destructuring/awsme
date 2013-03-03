@@ -1,0 +1,12 @@
+--- 
+run_list: 
+- tvdinner
+tvd: 
+  class: Awsme
+  name: awsme
+  author: Tom Bombadil
+  email: amanibhavam@destructuring.org
+  summary: awsme Ubuntu bootstrap
+  description: awsme Ubuntu bootstrap for ec2, vagrant
+  homepage: http://destructuring.org/tvd-awsme
+  git_url: https://github.com/destructuring/tvd-awsme
