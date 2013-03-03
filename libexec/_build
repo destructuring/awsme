@@ -27,12 +27,14 @@ function until_port_open {
   local address="$1"; shift
   local port="$1"; shift
 
+  logger_info "until $address:$port"
+
   while true; do
     if nc -z "$address" "$port"; then
       echo
       break
     fi
-    echo "."
+    echo -n "."
     sleep 5
   done
 }
@@ -40,19 +42,22 @@ function until_port_open {
 function until_vbox {
   local wanted="$1"; shift
 
+  logger_info "until $wanted"
+
   while true; do
     local current_state="$(vbox_state "$id_instance")"
     if [[ "$current_state" = "$wanted" ]]; then
       echo
       break
     fi
-    echo "."
+    echo -n "."
     sleep 5
   done
 }
 
 function while_ec2 {
   logger_info "while $@"
+
   while true; do
     local status="$(instance_status)"
 
@@ -73,6 +78,7 @@ function while_ec2 {
 
 function until_ec2 {
   logger_info "waiting for $@"
+
   while true; do
     local status="$(instance_status)"
 
