@@ -19,7 +19,7 @@ Gem::Specification.new do |s|
 
   s.require_path = "lib"
 
-  s.add_dependency "microwave"
+  s.add_dependency "chef"
 
   s.author      = "Tom Bombadil"
   s.email       = "amanibhavam@destructuring.org"
