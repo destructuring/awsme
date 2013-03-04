@@ -23,8 +23,10 @@ function main {
   # unecessary daemons
   aptitude -y purge whoopsie acpid nfs-common rpcbind
 
-  # enable only one tty
-  perl -pe 's{^ACTIVE_CONSOLES=.*}{ACTIVE_CONSOLES="/dev/tty1"}' -i /etc/default/console-setup
+  # don't start getty
+  for a in $(set +f; ls -d /etc/init/tty*.conf); do
+    echo "manual" >> "$a"
+  done
 
   # ruby
   aptitude -y install ruby rdoc ri irb rubygems ruby-dev 
