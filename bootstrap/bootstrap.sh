@@ -23,6 +23,9 @@ function main {
   # unecessary daemons
   aptitude -y purge whoopsie acpid nfs-common rpcbind
 
+  # enable only one tty
+  perl -pe 's{^ACTIVE_CONSOLES=.*}{ACTIVE_CONSOLES="/dev/tty1"}' -i /etc/default/console-setup
+
   # ruby
   aptitude -y install ruby rdoc ri irb rubygems ruby-dev 
   aptitude -y install build-essential libxml2-dev # minimum to build chef, chefspec, foodcritic, minitest-chef-handler
