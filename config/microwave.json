@@ -1,1 +1,1 @@
-{ "run_list": ["awsme"] }
+{ "run_list": ["awsme::project"] }
