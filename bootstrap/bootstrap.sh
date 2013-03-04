@@ -28,10 +28,11 @@ function main {
   gem install bundler --no-ri --no-rdoc -v '~> 1.2.5'
 
   # finishing up
-  aptitude clean
   atrm $(at -l | awk '{print $1}')
 
-  # TODO duplication for ec2, see finished.sh
+  ### START finished.sh
+  aptitude clean
+
   # remove cached network configurations
   rm -rfv /etc/udev/rules.d/70-persistent-net.rules
   mkdir -pv /etc/udev/rules.d/70-persistent-net.rules
@@ -40,6 +41,7 @@ function main {
 
   # don't see a battery
   rm -fv /etc/dbus-1/system.d/org.freedesktop.UPower.conf
+  ### END finished.sh
 
   poweroff
 }

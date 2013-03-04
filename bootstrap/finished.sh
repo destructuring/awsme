@@ -1,6 +1,8 @@
 #!/bin/bash -exfu
 
 function main {
+  aptitude clean
+
   # remove cached network configurations
   rm -rfv /etc/udev/rules.d/70-persistent-net.rules
   mkdir -pv /etc/udev/rules.d/70-persistent-net.rules
