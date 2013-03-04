@@ -36,43 +36,43 @@ function forwarded_ssh_port {
   VBoxManage showvminfo "$id_instance" --machinereadable | awk '$1 ~ /^Forwarding\(.*?,22"/ { split($1,a,","); print a[4] }'
 }
 
-function bexec {
-  BUNDLE_GEMFILE="$shome/vendor/cache/vagrant/Gemfile" bundle exec "$@"
+function bev {
+  BUNDLE_GEMFILE="$shome/vendor/cache/vagrant/Gemfile" bundle exec vagrant "$@"
 }
 
 function build_vagrant {
   local id_instance
 
-  bexec vagrant box add precise-server-cloudimg-amd64 boxes/precise-server-cloudimg-amd64-vagrant-disk1.box || true
-  bexec bin/cook -j <(echo '{"run_list": ["vagrant"], "vagrant": { "box": "precise-server-cloudimg-amd64" }}')
-  bexec vagrant destroy -f
+  bev box add precise-server-cloudimg-amd64 boxes/precise-server-cloudimg-amd64-vagrant-disk1.box || true
+  bin/cook -j <(echo '{"run_list": ["vagrant"], "vagrant": { "box": "precise-server-cloudimg-amd64" }}')
+  bev destroy -f
 
   # bootstrap
-  bexec bin/cook -j <(echo '{"run_list": ["vagrant"], "vagrant": { "box": "precise-server-cloudimg-amd64", "provision": { "shell": { "path": "bootstrap/bootstrap.sh" }}}}')
-  bexec vagrant up
+  bin/cook -j <(echo '{"run_list": ["vagrant"], "vagrant": { "box": "precise-server-cloudimg-amd64", "provision": { "shell": { "path": "bootstrap/bootstrap.sh" }}}}')
+  bev up
   id_instance="$(bundle exec ruby -e 'require "json"; puts JSON.load(File.read(".vagrant"))["active"]["default"]')"
   until_vbox "poweroff"
 
   # guest additions
-  bexec bin/cook -j <(echo '{"run_list": ["vagrant"], "vagrant": { "box": "precise-server-cloudimg-amd64", "provision": { "shell": { "path": "bootstrap/guest_additions.sh" }}}}')
-  bexec vagrant up
+  bin/cook -j <(echo '{"run_list": ["vagrant"], "vagrant": { "box": "precise-server-cloudimg-amd64", "provision": { "shell": { "path": "bootstrap/guest_additions.sh" }}}}')
+  bev up
 
   # bundling
-  bexec bin/cook -j <(echo '{"run_list": ["vagrant"], "vagrant": { "box": "precise-server-cloudimg-amd64", "provision": { "shell": { "path": "bootstrap/finished.sh" }}}}')
-  bexec vagrant provision
-  bexec vagrant package
+  bin/cook -j <(echo '{"run_list": ["vagrant"], "vagrant": { "box": "precise-server-cloudimg-amd64", "provision": { "shell": { "path": "bootstrap/finished.sh" }}}}')
+  bev provision
+  bev package
   mv package.box boxes/awsme.box
-  bexec vagrant box remove awsme || true
-  bexec vagrant box add awsme boxes/awsme.box
-  bexec vagrant destroy -f
+  bev box remove awsme || true
+  bev box add awsme boxes/awsme.box
+  bev destroy -f
 
   # boot up new box
-  bexec bin/cook -j <(echo '{"run_list": ["vagrant"], "vagrant": { "box": "awsme" }}')
-  bexec vagrant up
-  id_instance="$(bundle exec -e 'require "json"; puts JSON.load(File.read(".vagrant"))["active"]["default"]')"
+  bin/cook -j <(echo '{"run_list": ["vagrant"], "vagrant": { "box": "awsme" }}')
+  bev up
+  id_instance="$(bundle exec ruby -e 'require "json"; puts JSON.load(File.read(".vagrant"))["active"]["default"]')"
   until_vbox "running"
   time until_port_open localhost "$(forwarded_ssh_port)"
-  bexec vagrant ssh -- -l ubuntu
+  bev ssh -- -l ubuntu
 }
 
 require sub "$BASH_SOURCE" "$@"
