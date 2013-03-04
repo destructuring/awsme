@@ -15,6 +15,8 @@ function main {
   aptitude -y upgrade
   aptitude hold linux-headers linux-{,{headers,image}-}{generic,server,virtual}
 
+  update-ca-certificates --fresh
+
   # basic packages
   aptitude -y install wget curl netcat git rsync make
 
@@ -23,8 +25,7 @@ function main {
 
   # ruby
   aptitude -y install ruby rdoc ri irb rubygems ruby-dev 
-  aptitude -y install build-essential curl zlib1g-dev libreadline-gplv2-dev \
-                      libxml2-dev libsqlite3-dev file git bison adduser # ruby-rvm package dependencies
+  aptitude -y install build-essential libxml2-dev # minimum to build chef, chefspec, foodcritic, minitest-chef-handler
   gem install bundler --no-ri --no-rdoc -v '~> 1.2.5'
 
   # finishing up
