@@ -8,4 +8,4 @@ gem "minitest-chef-handler"
 gem "foodcritic", :platforms => :ruby_19
 
 gem "aws-sdk"
-gem "tvd-vagrant"
+gem "tvd-vagrant", (ENV['EDIT_tvd_vagrant'] ? { :github => "destructuring/tvd-vagrant" } : {})
