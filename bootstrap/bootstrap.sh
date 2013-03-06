@@ -39,13 +39,13 @@ function main {
               x11-xkb-utils xfonts-encodings xserver-common
 
   # don't start getty
-  for a in $(set +f; cd /etc/init && ls -d tty*.conf plymouth* setvtrgb.conf upstart-socket-bridge.conf); do
+  for a in $(set +f; cd /etc/init && ls -d tty*.conf); do
     echo "manual" >> "/etc/init/$a"
   done
 
   # ruby
   aptitude -y install ruby rdoc ri irb rubygems ruby-dev 
-  aptitude -y install build-essential libxml2-dev # minimum to build chef, chefspec, foodcritic, minitest-chef-handler
+  aptitude -y install build-essential libxml2-dev libxslt-dev # minimum to build chef, chefspec, foodcritic, minitest-chef-handler, nokogiri
   gem install bundler --no-ri --no-rdoc -v '~> 1.2.5'
 
   # finishing up
