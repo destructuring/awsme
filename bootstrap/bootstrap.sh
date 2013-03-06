@@ -35,10 +35,11 @@ function main {
               libaugeas0 libfontenc1 libllvm3.0 libxcomposite1 libxdamage1 libxfixes3 \
               libxfont1 libxkbfile1 libxrandr2 libzookeeper-mt2 puppet-common \
               python-support python-twisted python-twisted-conch xfonts-base xfonts-utils \
-              xserver-xorg-core
+              xserver-xorg-core virtualbox-guest-x11 libgl1-mesa-dri \
+              x11-xkb-utils xfonts-encodings xserver-common
 
   # don't start getty
-  for a in $(set +f; cd /etc/init && ls -d tty*.conf dbus.conf plymouth* setvtrgb.conf upstart-socket-bridge.conf); do
+  for a in $(set +f; cd /etc/init && ls -d tty*.conf plymouth* setvtrgb.conf upstart-socket-bridge.conf); do
     echo "manual" >> "/etc/init/$a"
   done
 
