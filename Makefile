@@ -1,3 +1,5 @@
+SHELL := /bin/bash
+
 all: ready pyaws
 
 ready: config/aws.yml
