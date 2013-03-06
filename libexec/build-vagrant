@@ -48,13 +48,13 @@ function build_vagrant {
   bev destroy -f
 
   # bootstrap
-  bin/cook -j <(echo '{"run_list": ["vagrant"], "vagrant": { "box": "precise-server-cloudimg-amd64", "provision": { "shell": { "path": "bootstrap/bootstrap.sh" }}}}')
+  bin/cook -j <(echo '{"run_list": ["vagrant"], "vagrant": { "box": "precise-server-cloudimg-amd64", "provision": { "shell": { "path": "bootstrap/ubuntu.sh" }}}}')
   bev up
   id_instance="$(bundle exec ruby -e 'require "json"; puts JSON.load(File.read(".vagrant"))["active"]["default"]')"
   until_vbox "poweroff"
 
-  # guest additions
-  bin/cook -j <(echo '{"run_list": ["vagrant"], "vagrant": { "box": "precise-server-cloudimg-amd64", "provision": { "shell": { "path": "bootstrap/guest_additions.sh" }}}}')
+  # virtualbox
+  bin/cook -j <(echo '{"run_list": ["vagrant"], "vagrant": { "box": "precise-server-cloudimg-amd64", "provision": { "shell": { "path": "bootstrap/virtualbox.sh" }}}}')
   bev up
 
   # bundling
