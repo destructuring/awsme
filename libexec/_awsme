@@ -16,6 +16,10 @@ export AWS_AUTO_SCALING_HOME="$(set +f; ls -d $AWSME/vendor/projects/AutoScaling
 export JAVA_HOME
 
 if [[ -z "$JAVA_HOME" ]]; then
+  JAVA_HOME="$(dirname $(dirname $(readlink -f /usr/bin/java)))"
+fi
+
+if [[ -z "$JAVA_HOME" ]]; then
   logger_fatal "specify java install in environment variable JAVA_HOME"
   exit 1
 fi
