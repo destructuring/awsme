@@ -11,7 +11,7 @@ gem "foodcritic", :platforms => :ruby_19
 
 gem "aws-sdk"
 
-dev "tvd-vagrant"
+gem "tvd-vagrant"
 
 group :virtualbox do
   gem "vagrant", "1.0.6"

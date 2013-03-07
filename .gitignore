@@ -17,5 +17,3 @@
 /.vagrant
 /boxes
 /Vagrantfile
-/vendor/cache/vagrant/.bundle/
-/vendor/cache/vagrant/vendor/bundle
