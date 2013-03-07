@@ -1,0 +1,15 @@
+{
+  "run_list": [
+    "tvdinner"
+  ],
+  "tvd": {
+    "author": "Tom Bombadil",
+    "class": "Awsme",
+    "description": "awsme Ubuntu bootstrap for ec2, vagrant",
+    "email": "amanibhavam@destructuring.org",
+    "git_url": "https://github.com/destructuring/tvd-awsme",
+    "homepage": "http://destructuring.org/tvd-awsme",
+    "name": "awsme",
+    "summary": "awsme Ubuntu bootstrap"
+  }
+}

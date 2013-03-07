@@ -5,7 +5,7 @@ require "tvd-awsme/version"
 
 Gem::Specification.new do |s|
   s.name        = "tvd-awsme"
-  s.version     = ENV['EDIT_tvd_vagrant'] ? "#{TVDinner::Awsme::VERSION}.rc#{%x(git log --max-count=1 --pretty=format:%ct)}" : TVDinner::Awsme::VERSION
+  s.version     = ENV['EDIT_awsme'] ? "#{TVDinner::Awsme::VERSION}.rc#{%x(git log --max-count=1 --pretty=format:%ct)}" : TVDinner::Awsme::VERSION
   s.homepage    = "http://destructuring.org/tvd-awsme"
   s.license     = "Apache 2.0"
 

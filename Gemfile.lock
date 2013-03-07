@@ -108,7 +108,7 @@ GEM
     treetop (1.4.12)
       polyglot
       polyglot (>= 0.3.1)
-    tvd-tvdinner (0.0.17)
+    tvd-tvdinner (0.0.18)
       chef
     tvd-vagrant (0.0.5.rc1362593742)
       chef
