@@ -117,4 +117,4 @@ DEPENDENCIES
   minitest-chef-handler
   tvd-awsme!
   tvd-tvdinner
-  tvd-vagrant
+  tvd-vagrant (= 0.0.5.rc1362593742)
