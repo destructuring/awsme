@@ -27,7 +27,7 @@ function main {
         if [[ -d "$a" ]]; then
           pushd $a > /dev/null
           (set +f; rm -f *.gem)
-          (export EDIT_$(basename ${a//-/_})=1; libexec/build-gem)
+          (export EDIT_$(basename ${a//-/_})=1; gem build $(basename $(pwd)).gemspec)
           (set +f; mv *.gem $shome/vendor/cache/)
           popd > /dev/null
         fi
