@@ -3,6 +3,7 @@
 /*.gem
 /crash.log
 /output
+/git
 *.orig
 /tmp
 /libexec/virtualenv.pyc
@@ -18,4 +19,3 @@
 /Vagrantfile
 /vendor/cache/vagrant/.bundle/
 /vendor/cache/vagrant/vendor/bundle
-/git

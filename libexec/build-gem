@@ -33,7 +33,7 @@ function main {
         fi
       done
     elif [[ -e "$pth_gemspec" ]]; then
-      gem build "$pth_gemspec"
+  gem build "$pth_gemspec"
     else
       logger_fatal "could not find gemspec $pth_gemspec"
       exit 1

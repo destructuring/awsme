@@ -1,3 +1,5 @@
+require "development"
+
 source "https://rubygems.org"
 
 gemspec
@@ -9,6 +11,8 @@ gem "foodcritic", :platforms => :ruby_19
 
 gem "aws-sdk"
 
-require "development"
-
 dev "tvd-vagrant"
+
+group :virtualbox do
+  gem "vagrant", "1.0.6"
+end
