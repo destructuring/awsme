@@ -21,8 +21,6 @@ require build
 function main {
   cd $shome
 
-  make vagrant
-
   local opt_ssh=
 
   if [[ "$FLAGS_sshagent" = "$FLAGS_TRUE" ]]; then
@@ -36,43 +34,39 @@ function forwarded_ssh_port {
   VBoxManage showvminfo "$id_instance" --machinereadable | awk '$1 ~ /^Forwarding\(.*?,22"/ { split($1,a,","); print a[4] }'
 }
 
-function bev {
-  BUNDLE_GEMFILE="$shome/vendor/cache/vagrant/Gemfile" bundle exec vagrant "$@"
-}
-
 function build_vagrant {
   local id_instance
 
-  bev box add precise-server-cloudimg-amd64 boxes/precise-server-cloudimg-amd64-vagrant-disk1.box || true
+  bundle exec vagrant box add precise-server-cloudimg-amd64 boxes/precise-server-cloudimg-amd64-vagrant-disk1.box || true
   bin/cook -j <(echo '{"run_list": ["vagrant"], "vagrant": { "box": "precise-server-cloudimg-amd64" }}')
-  bev destroy -f
+  bundle exec vagrant destroy -f
 
   # bootstrap
   bin/cook -j <(echo '{"run_list": ["vagrant"], "vagrant": { "box": "precise-server-cloudimg-amd64", "provision": { "shell": { "path": "bootstrap/ubuntu.sh" }}}}')
-  bev up
+  bundle exec vagrant up
   id_instance="$(bundle exec ruby -e 'require "json"; puts JSON.load(File.read(".vagrant"))["active"]["default"]')"
   until_vbox "poweroff"
 
   # virtualbox
   bin/cook -j <(echo '{"run_list": ["vagrant"], "vagrant": { "box": "precise-server-cloudimg-amd64", "provision": { "shell": { "path": "bootstrap/virtualbox.sh" }}}}')
-  bev up
+  bundle exec vagrant up
 
   # bundling
   bin/cook -j <(echo '{"run_list": ["vagrant"], "vagrant": { "box": "precise-server-cloudimg-amd64", "provision": { "shell": { "path": "bootstrap/finished.sh" }}}}')
-  bev provision
-  bev package
+  bundle exec vagrant provision
+  bundle exec vagrant package
   mv package.box boxes/awsme.box
-  bev box remove awsme || true
-  bev box add awsme boxes/awsme.box
-  bev destroy -f
+  bundle exec vagrant box remove awsme || true
+  bundle exec vagrant box add awsme boxes/awsme.box
+  bundle exec vagrant destroy -f
 
   # boot up new box
   bin/cook -j <(echo '{"run_list": ["vagrant"], "vagrant": { "box": "awsme" }}')
-  bev up
+  bundle exec vagrant up
   id_instance="$(bundle exec ruby -e 'require "json"; puts JSON.load(File.read(".vagrant"))["active"]["default"]')"
   until_vbox "running"
   time until_port_open localhost "$(forwarded_ssh_port)"
-  bev ssh -- -l ubuntu
+  bundle exec vagrant ssh -- -l ubuntu
 }
 
 require sub "$BASH_SOURCE" "$@"
