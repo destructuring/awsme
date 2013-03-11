@@ -3,9 +3,10 @@
 if [[ "$#" > 0 ]]; then
   AWSME="$1"; shift
 else
-  AWSME="$(cd -P -- "$(dirname -- "${BASH_SOURCE}")/.." && pwd -P)"
+  : ${AWSME:="$(cd -P -- "$(dirname -- "${BASH_SOURCE}")/.." && pwd -P)"}
 fi
 
+PATH="$PATH:${AWSME}/libexec"
 
 export EC2_HOME="$AWSME/vendor/projects/ec2"
 export AWS_CLOUDFORMATION_HOME="$AWSME/vendor/projects/cfn"
