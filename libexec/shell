@@ -14,10 +14,13 @@ source "$shome/libexec/_jason"
 require awsme
 require build
 
+DEFINE_string "working" "$shome" "Working directory" "w"
+
 # entry point
 function main {
   cd "$shome"
   make
+  cd "$FLAGS_working"
   exec $SHELL
 }
 
