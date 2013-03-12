@@ -16,7 +16,7 @@ require build
 
 DEFINE_string "working" "$shome" "Working directory" "w"
 DEFINE_boolean "clean" "$FLAGS_FALSE" "Run sub-shell disabling profiles and prompts" "c"
-DEFINE_string "shell" "$SHELL" "Run a different shell" "s"
+DEFINE_string "shell" "$SHELL" "Run a different shell" "S"
 
 # entry point
 function main {
