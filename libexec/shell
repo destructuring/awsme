@@ -15,11 +15,19 @@ require awsme
 require build
 
 DEFINE_string "working" "$shome" "Working directory" "w"
+DEFINE_boolean "clean" "$FLAGS_FALSE" "Run sub-shell disabling profiles and prompts" "c"
+DEFINE_string "shell" "$SHELL" "Run a different shell" "s"
 
 # entry point
 function main {
   cd "$FLAGS_working"
-  exec $SHELL
+
+  if [[ "$FLAGS_clean" = "$FLAGS_TRUE" ]]; then
+    unset PROMPT_COMMAND
+    exec $FLAGS_shell --norc --noprofile
+  else
+    exec $FLAGS_shell
+  fi
 }
 
 function dna {
