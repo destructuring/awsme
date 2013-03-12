@@ -48,7 +48,7 @@ function build_vagrant {
   until_vbox "poweroff"
 
   # virtualbox
-  bin/cook -j <(echo '{"run_list": ["vagrant"], "vagrant": { "box": "precise-server-cloudimg-amd64", "provision": { "shell": { "path": "'"${AWSME}"'`/bootstrap/virtualbox.sh" }}}}')
+  bin/cook -j <(echo '{"run_list": ["vagrant"], "vagrant": { "box": "precise-server-cloudimg-amd64", "provision": { "shell": { "path": "'"${AWSME}"'/bootstrap/virtualbox.sh" }}}}')
   bundle exec vagrant up
 
   # bundling
