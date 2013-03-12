@@ -7,7 +7,8 @@ else
 fi
 
 export AWSME
-PATH="$PATH:${AWSME}/libexec"
+
+PATH="$PATH:${shome}/libexec"
 
 export EC2_HOME="$AWSME/vendor/projects/ec2"
 export AWS_CLOUDFORMATION_HOME="$AWSME/vendor/projects/cfn"
