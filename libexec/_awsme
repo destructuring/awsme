@@ -7,6 +7,7 @@ else
 fi
 
 export AWSME
+
 PATH="$PATH:${shome}/libexec"
 
 export EC2_HOME="$AWSME/vendor/projects/ec2"
