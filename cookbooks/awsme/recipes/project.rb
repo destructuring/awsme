@@ -1,5 +1,5 @@
 require 'yaml'
-aws_secrets = YAML.load(File.read("#{File.join(ENV['AWSME']}/config/aws.yml"))
+aws_secrets = YAML.load(File.read("#{ENV['AWSME']}/config/aws.yml"))
 
 node.default[:aws][:access_key] = aws_secrets["AWS_ACCESS_KEY"]
 node.default[:aws][:secret_key] = aws_secrets["AWS_SECRET_KEY"]
