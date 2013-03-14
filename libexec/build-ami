@@ -34,7 +34,7 @@ function image_status {
 function run_ubuntu_base {
   local source_ami="$(pick_ami)"
   local tmp_run="$(mktemp -t XXXXXXXXX)"
-  ec2-run-instances --region $FLAGS_region -K $EC2_PRIVATE_KEY -C $EC2_CERT $source_ami -n 1 -t $FLAGS_instype --instance-initiated-shutdown-behavior stop -f "${AWSME}/bootstrap/ubuntu.sh" $opt_ec2 > "$tmp_run"
+  ec2-run-instances --region $FLAGS_region -K $EC2_PRIVATE_KEY -C $EC2_CERT $source_ami -n 1 -t $FLAGS_instype --instance-initiated-shutdown-behavior stop -f "${shome}/bootstrap/ubuntu.sh" $opt_ec2 > "$tmp_run"
   cat "$tmp_run" 1>&2
   local id_instance="$(awk '$1 == "INSTANCE" {print $2}' "$tmp_run")"
   rm -f "$tmp_run"

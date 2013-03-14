@@ -31,17 +31,17 @@ function build_vagrant {
   bundle exec vagrant destroy -f
 
   # bootstrap
-  bin/cook -j <(echo '{"run_list": ["vagrant"], "vagrant": { "box": "precise-server-cloudimg-amd64", "provision": { "shell": { "path": "'"${AWSME}"'/bootstrap/ubuntu.sh" }}}}')
+  bin/cook -j <(echo '{"run_list": ["vagrant"], "vagrant": { "box": "precise-server-cloudimg-amd64", "provision": { "shell": { "path": "'"${shome}"'/bootstrap/ubuntu.sh" }}}}')
   bundle exec vagrant up
   id_instance="$(bundle exec ruby -e 'require "json"; puts JSON.load(File.read(".vagrant"))["active"]["default"]')"
   until_vbox "poweroff"
 
   # virtualbox
-  bin/cook -j <(echo '{"run_list": ["vagrant"], "vagrant": { "box": "precise-server-cloudimg-amd64", "provision": { "shell": { "path": "'"${AWSME}"'/bootstrap/virtualbox.sh" }}}}')
+  bin/cook -j <(echo '{"run_list": ["vagrant"], "vagrant": { "box": "precise-server-cloudimg-amd64", "provision": { "shell": { "path": "'"${shome}"'/bootstrap/virtualbox.sh" }}}}')
   bundle exec vagrant up
 
   # bundling
-  bin/cook -j <(echo '{"run_list": ["vagrant"], "vagrant": { "box": "precise-server-cloudimg-amd64", "provision": { "shell": { "path": "'"${AWSME}"'/bootstrap/finished.sh" }}}}')
+  bin/cook -j <(echo '{"run_list": ["vagrant"], "vagrant": { "box": "precise-server-cloudimg-amd64", "provision": { "shell": { "path": "'"${shome}"'/bootstrap/finished.sh" }}}}')
   bundle exec vagrant provision
   bundle exec vagrant package
   mv package.box boxes/awsme.box

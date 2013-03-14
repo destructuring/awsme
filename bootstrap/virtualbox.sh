@@ -1,7 +1,8 @@
 #!/bin/bash -exfu
 
+exec > >(tee -a /var/log/awsme.log | logger -t awsme -s) 2>&1
+
 function main {
-  exec > >(tee -a /var/log/awsme.log | logger -t awsme -s) 2>&1
 
   export DEBIAN_FRONTEND="noninteractive"
 

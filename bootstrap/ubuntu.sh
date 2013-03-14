@@ -1,9 +1,8 @@
 #!/bin/bash -exfu
 
-function main {
-  # This logs the output of the user-data. http://alestic.com/2010/12/ec2-user-data-output
-  exec > >(tee /var/log/awsme.log | logger -t awsme -s) 2>&1
+exec > >(tee -a /var/log/awsme.log | logger -t awsme -s) 2>&1
 
+function main {
   # Stop instance before first hour, probably a runaway instance by then
   echo poweroff | at now + 50 minutes
 
@@ -26,7 +25,7 @@ function main {
 
   # ruby
   aptitude -y install ruby rdoc ri irb rubygems ruby-dev 
-  aptitude -y install build-essential libxml2-dev libxslt-dev # minimum to build chef, chefspec, foodcritic, minitest-chef-handler, nokogiri
+
   gem install bundler --no-ri --no-rdoc -v '~> 1.2.5'
 
   # don't start getty
