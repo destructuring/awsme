@@ -20,18 +20,7 @@ require build
 # entry point
 function main {
   cd $shome
-
-  local opt_ssh=
-
-  if [[ "$FLAGS_sshagent" = "$FLAGS_TRUE" ]]; then
-    opt_ssh="$opt_ssh -A"
-  fi
-
   time build_vagrant
-}
-
-function forwarded_ssh_port {
-  VBoxManage showvminfo "$id_instance" --machinereadable | awk '$1 ~ /^Forwarding\(.*?,22"/ { split($1,a,","); print a[4] }'
 }
 
 function build_vagrant {

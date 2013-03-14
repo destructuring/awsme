@@ -7,7 +7,6 @@ DEFINE_string 'arch' 'amd64' 'AWS arch' 'a'
 DEFINE_string 'instype' 'm1.large' "AWS instance type" "T"
 DEFINE_string 'release' 'precise' 'Ubuntu release' 'U'
 DEFINE_string 'sshauth' "$HOME/.ssh/authorized_keys" 'Authorized ssh keys' 's'
-DEFINE_boolean 'sshagent' "$FLAGS_FALSE" 'Forward ssh agent' 'A'
 
 function pick_ami {
 	# This selects the most recent release Ubuntu cloud image
@@ -113,4 +112,8 @@ function until_ami {
   done
 
   echo
+}
+
+function forwarded_ssh_port {
+  VBoxManage showvminfo "$id_instance" --machinereadable | awk '$1 ~ /^Forwarding\(.*?,22"/ { split($1,a,","); print a[4] }'
 }

@@ -20,13 +20,6 @@ require build
 # entry point
 function main {
   cd $shome
-
-  local opt_ssh=
-
-  if [[ "$FLAGS_sshagent" = "$FLAGS_TRUE" ]]; then
-    opt_ssh="$opt_ssh -A"
-  fi
-
   time build_ami
 }
 
@@ -86,7 +79,7 @@ function build_ami {
   # wait for ssh to watch logs
   local hst_instance="$(instance_status)"
   until_port_open "$hst_instance" 22
-  ssh $opt_ssh -o "StrictHostKeyChecking no" ubuntu@"$hst_instance" bash -c "'while [[ ! -f /var/log/awsme.log ]]; do sleep 1; done; tail -f /var/log/awsme.log'" || true
+  ssh -o "StrictHostKeyChecking no" ubuntu@"$hst_instance" bash -c "'while [[ ! -f /var/log/awsme.log ]]; do sleep 1; done; tail -f /var/log/awsme.log'" || true
     
   # wait for script to finish
   until_ec2 "stopped" "terminated"
@@ -117,7 +110,7 @@ function build_ami {
   # wait for ssh
   local hst_instance="$(instance_status)"
   until_port_open "$hst_instance" 22
-  ssh $opt_ssh -o "StrictHostKeyChecking no" ubuntu@"$hst_instance" || true
+  ssh -o "StrictHostKeyChecking no" ubuntu@"$hst_instance" || true
   ec2-terminate-instances --region "$FLAGS_region" $id_instance
 
   # cleanup
