@@ -33,7 +33,7 @@ function build_vagrant {
   # bootstrap
   bin/cook -j <(echo '{"run_list": ["vagrant"], "vagrant": { "box": "precise-server-cloudimg-amd64", "provision": { "shell": { "path": "'"${shome}"'/bootstrap/ubuntu.sh" }}}}')
   bundle exec vagrant up
-  id_instance="$(bundle exec ruby -e 'require "json"; puts JSON.load(File.read(".vagrant"))["active"]["default"]')"
+  id_instance="$(cat $shome/.vagrant/machines/default/virtualbox/id)"
   until_vbox "poweroff"
 
   # virtualbox
@@ -52,7 +52,7 @@ function build_vagrant {
   # boot up new box
   bin/cook -j <(echo '{"run_list": ["vagrant"], "vagrant": { "box": "awsme" }}')
   bundle exec vagrant up
-  id_instance="$(bundle exec ruby -e 'require "json"; puts JSON.load(File.read(".vagrant"))["active"]["default"]')"
+  id_instance="$(cat $shome/.vagrant/machines/default/virtualbox/id)"
   until_vbox "running"
   time until_port_open localhost "$(forwarded_ssh_port)"
   bundle exec vagrant ssh -- -l ubuntu

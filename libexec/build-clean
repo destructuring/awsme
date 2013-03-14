@@ -28,7 +28,7 @@ function build_clean {
   bin/cook -j <(echo '{"run_list": ["vagrant"], "vagrant": { "box": "awsme" }}')
   bundle exec vagrant destroy -f || true
   bundle exec vagrant up
-  local id_instance="$(bundle exec ruby -e 'require "json"; puts JSON.load(File.read(".vagrant"))["active"]["default"]')"
+  local id_instance="$(cat $shome/.vagrant/machines/default/virtualbox/id)"
   until_vbox "running"
   time until_port_open localhost "$(forwarded_ssh_port)"
 
