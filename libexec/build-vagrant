@@ -43,9 +43,8 @@ function build_vagrant {
   # bundling
   bin/cook -j <(echo '{"run_list": ["vagrant"], "vagrant": { "box": "precise-server-cloudimg-amd64", "provision": { "shell": { "path": "'"${shome}"'/bootstrap/finished.sh" }}}}')
   bundle exec vagrant provision
-  bundle exec vagrant package
-  mv package.box boxes/awsme.box
-  bundle exec vagrant box remove awsme || true
+  bundle exec vagrant package --output boxes/awsme.box
+  bundle exec vagrant box remove awsme virtualbox || true
   bundle exec vagrant box add awsme boxes/awsme.box
   bundle exec vagrant destroy -f
 
