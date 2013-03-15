@@ -46,7 +46,7 @@ EOF
 }
 
 function build_virtualbox {
-  local release_dir="$shome/vagrant-$(date +%Y%m%d-%H%M)"
+  local release_dir="$shome/vagrant-$(date +%Y%m%d-%H%M-$$)"
   mkdir -p $release_dir.{build,demo} # TODO move to tvd-vagrant
 
   local id_instance
