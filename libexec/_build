@@ -105,6 +105,9 @@ function until_ami {
     for wanted in "$@"; do
       if [[ "$status" = "$wanted" ]]; then
         break 2
+      elif [[ "$status" = "failed" ]]; then
+        logger_fatal "ami failed to bundle"
+        exit 1
       fi
     done
     echo -n "."

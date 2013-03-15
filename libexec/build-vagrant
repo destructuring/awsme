@@ -27,10 +27,10 @@ function conf_virtualbox {
   local nm_box="$1"; shift
 
   if [[ "$#" = 0 ]]; then
-    $shome/bin/cook -j <(echo '{"run_list": ["vagrant"], "vagrant": { "box": "'"$nm_box"'" }}')
+    $shome/bin/cook -j <(echo '{"run_list": ["vagrant::virtualbox"], "vagrant": { "box": "'"$nm_box"'" }}')
   else
     local pth_script="$1"; shift
-    $shome/bin/cook -j <(echo '{"run_list": ["vagrant"], "vagrant": { "box": "'"$nm_box"'", "provision": { "shell": { "path": "'"$pth_script"'" }} }}')
+    $shome/bin/cook -j <(echo '{"run_list": ["vagrant::virtualbox"], "vagrant": { "box": "'"$nm_box"'", "provision": { "shell": { "path": "'"$pth_script"'" }} }}')
   fi
 }
 
@@ -38,7 +38,7 @@ function build_vagrant {
   local id_instance
 
   # import ubuntu box and destroy lingering vagrant
-  bundle exec vagrant box add precise-server-cloudimg-amd64 boxes/precise-server-cloudimg-amd64-vagrant-disk1.box || true
+  bundle exec vagrant box add precise-server-cloudimg-amd64 $shome/boxes/precise-server-cloudimg-amd64-vagrant-disk1.box || true
   conf_virtualbox "precise-server-cloudimg-amd64"
   bundle exec vagrant destroy -f
 
