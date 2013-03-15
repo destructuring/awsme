@@ -46,6 +46,7 @@ function main {
   rm -rfv /dev/.udev/ /var/lib/dhcp3/*
   ### END finished.sh
 
+  # power off for bundling
   poweroff
 }
 

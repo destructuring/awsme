@@ -23,34 +23,51 @@ function main {
   time build_vagrant
 }
 
+function conf_virtualbox {
+  local nm_box="$1"; shift
+
+  if [[ "$#" = 0 ]]; then
+    $shome/bin/cook -j <(echo '{"run_list": ["vagrant"], "vagrant": { "box": "'"$nm_box"'" }}')
+  else
+    local pth_script="$1"; shift
+    $shome/bin/cook -j <(echo '{"run_list": ["vagrant"], "vagrant": { "box": "'"$nm_box"'", "provision": { "shell": { "path": "'"$pth_script"'" }} }}')
+  fi
+}
+
 function build_vagrant {
   local id_instance
 
+  # import ubuntu box and destroy lingering vagrant
   bundle exec vagrant box add precise-server-cloudimg-amd64 boxes/precise-server-cloudimg-amd64-vagrant-disk1.box || true
-  bin/cook -j <(echo '{"run_list": ["vagrant"], "vagrant": { "box": "precise-server-cloudimg-amd64" }}')
+  conf_virtualbox "precise-server-cloudimg-amd64"
   bundle exec vagrant destroy -f
 
-  # bootstrap
-  bin/cook -j <(echo '{"run_list": ["vagrant"], "vagrant": { "box": "precise-server-cloudimg-amd64", "provision": { "shell": { "path": "'"${shome}"'/bootstrap/ubuntu.sh" }}}}')
+  # bootstrap until powered off
+  conf_virtualbox "precise-server-cloudimg-amd64" "$shome/bootstrap/ubuntu.sh"
   bundle exec vagrant up
   id_instance="$(cat $shome/.vagrant/machines/default/virtualbox/id)"
   until_vbox "poweroff"
 
-  # virtualbox
-  bin/cook -j <(echo '{"run_list": ["vagrant"], "vagrant": { "box": "precise-server-cloudimg-amd64", "provision": { "shell": { "path": "'"${shome}"'/bootstrap/virtualbox.sh" }}}}')
+  # virtualbox guest additions with updated kernel
+  conf_virtualbox "precise-server-cloudimg-amd64" "$shome/bootstrap/virtualbox.sh"
   bundle exec vagrant up
+  id_instance="$(cat $shome/.vagrant/machines/default/virtualbox/id)"
+  until_vbox "running"
+
+  # cleanup and power off
+  conf_virtualbox "precise-server-cloudimg-amd64" "$shome/bootstrap/finished.sh"
+  bundle exec vagrant provision
+  until_vbox "poweroff"
 
   # bundling
-  bin/cook -j <(echo '{"run_list": ["vagrant"], "vagrant": { "box": "precise-server-cloudimg-amd64", "provision": { "shell": { "path": "'"${shome}"'/bootstrap/finished.sh" }}}}')
-  bundle exec vagrant provision
-  bundle exec vagrant package --output boxes/awsme.box.tmp
-  mv -f boxes/awsme.box.tmp boxes/awsme.box
+  bundle exec vagrant package --output $shome/boxes/awsme.box.tmp
+  mv -f $shome/boxes/awsme.box.tmp $shome/boxes/awsme.box
   bundle exec vagrant box remove awsme virtualbox || true
-  bundle exec vagrant box add awsme boxes/awsme.box
+  bundle exec vagrant box add awsme $shome/boxes/awsme.box
   bundle exec vagrant destroy -f
 
   # boot up new box
-  bin/cook -j <(echo '{"run_list": ["vagrant"], "vagrant": { "box": "awsme" }}')
+  conf_virtualbox "awsme"
   bundle exec vagrant up
   id_instance="$(cat $shome/.vagrant/machines/default/virtualbox/id)"
   until_vbox "running"
