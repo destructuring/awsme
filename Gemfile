@@ -2,7 +2,7 @@ source "https://rubygems.org"
 
 gemspec
 
-require "./lib/development.rb"
+require File.expand_path("../lib/development.rb", __FILE__)
 
 gem "tvd-tvdinner" unless File.exists?(File.expand_path("../tvd-tvdinner.gemspec", __FILE__))
 gem "chefspec"
@@ -14,6 +14,5 @@ gem "aws-sdk"
 gem "tvd-vagrant"
 
 group :virtualbox do
-  gem "vagrant", "1.1.0"
-  gem "vagrant-aws", "0.1.0"
+  gem "vagrant", "~> 1.1.1destructuring1"
 end
