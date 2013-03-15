@@ -47,11 +47,6 @@ function build_vagrant {
   conf_virtualbox "precise-server-cloudimg-amd64" "$shome/bootstrap/virtualbox.sh"
   bundle exec vagrant up
   id_instance="$(cat $shome/.vagrant/machines/default/virtualbox/id)"
-  until_vbox "running"
-
-  # cleanup and power off
-  conf_virtualbox "precise-server-cloudimg-amd64" "$shome/bootstrap/finished.sh"
-  bundle exec vagrant provision
   until_vbox "poweroff"
 
   # bundling

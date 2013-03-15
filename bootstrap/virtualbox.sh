@@ -1,9 +1,6 @@
 #!/bin/bash -exfu
 
-exec > >(tee -a /var/log/awsme.log | logger -t awsme -s) 2>&1
-
 function main {
-
   export DEBIAN_FRONTEND="noninteractive"
 
   # remove crap from vagrant cloud images to match ec2
@@ -20,6 +17,7 @@ function main {
               xserver-xorg-core virtualbox-guest-x11 libgl1-mesa-dri \
               x11-xkb-utils xfonts-encodings xserver-common
 
+  # rebuild guest additions
   aptitude purge -y virtualbox-guest-{dkms,utils,x11}
 
   cp /vagrant/boxes/VBoxGuestAdditions.iso ~/
@@ -27,7 +25,20 @@ function main {
   sh /mnt/VBoxLinuxAdditions.run
   umount /mnt
   rm -f ~/VBoxGuestAdditions.iso
+
+  ### START finished.sh
+  aptitude clean
+
+  # remove cached network configurations
+  rm -rfv /etc/udev/rules.d/70-persistent-net.rules
+  mkdir -pv /etc/udev/rules.d/70-persistent-net.rules
+  rm -fv /lib/udev/rules.d/75-persistent-net-generator.rules
+  rm -rfv /dev/.udev/ /var/lib/dhcp3/*
+
+  poweroff
+  ### END finished.sh
 }
 
-main "$@"
+exec > >(tee -a /var/log/awsme.log | logger -t awsme -s) 2>&1
 
+main "$@"

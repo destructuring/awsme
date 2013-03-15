@@ -1,20 +1,15 @@
 #!/bin/bash -exfu
 
-exec > >(tee -a /var/log/awsme.log | logger -t awsme -s) 2>&1
-
 function main {
-  # Stop instance before first hour, probably a runaway instance by then
-  echo poweroff | at now + 50 minutes
+  export DEBIAN_FRONTEND="noninteractive"
 
-  # Update and install various packages
-  export DEBIAN_FRONTEND=noninteractive
-
+  # update everything
   aptitude update
   aptitude -y dist-upgrade
   aptitude -y upgrade
-  aptitude hold linux-headers linux-{,{headers,image}-}{generic,server,virtual}
 
-  update-ca-certificates --fresh
+  # don't upgrade kernel hereafter
+  aptitude hold linux-headers linux-{,{headers,image}-}{generic,server,virtual}
 
   # basic packages
   aptitude -y install wget curl netcat git rsync make
@@ -33,8 +28,8 @@ function main {
     echo "manual" >> "/etc/init/$a"
   done
 
-  # finishing up
-  atrm $(at -l | awk '{print $1}')
+  # ssl updates
+  update-ca-certificates --fresh
 
   ### START finished.sh
   aptitude clean
@@ -44,10 +39,14 @@ function main {
   mkdir -pv /etc/udev/rules.d/70-persistent-net.rules
   rm -fv /lib/udev/rules.d/75-persistent-net-generator.rules
   rm -rfv /dev/.udev/ /var/lib/dhcp3/*
-  ### END finished.sh
 
-  # power off for bundling
   poweroff
+  ### END finished.sh
 }
 
+exec > >(tee -a /var/log/awsme.log | logger -t awsme -s) 2>&1
+
+# Stop instance before first hour, probably a runaway instance by then
+echo poweroff | at now + 50 minutes
 main "$@"
+atrm $(at -l | awk '{print $1}')
