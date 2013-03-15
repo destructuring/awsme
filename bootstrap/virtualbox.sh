@@ -22,7 +22,7 @@ function main {
   # rebuild guest additions
   aptitude purge -y virtualbox-guest-{dkms,utils,x11}
 
-  wget -nv http://download.virtualbox.org/virtualbox/${ver_vbox}/VBoxGuestAdditions_${ver_vbox}.iso
+  wget -nv http://download.virtualbox.org/virtualbox/${ver_vbox}/VBoxGuestAdditions_${ver_vbox}.iso -O ~/VBoxGuestAdditions_${ver_vbox}.iso
   mount -o loop ~/VBoxGuestAdditions_${ver_vbox}.iso /mnt
   sh /mnt/VBoxLinuxAdditions.run
   umount /mnt
