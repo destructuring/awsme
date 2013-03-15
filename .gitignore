@@ -13,7 +13,5 @@
 /config/*.yml
 /config/*.pem
 /config/*.txt
-/.vagrant
 /boxes
-/Vagrantfile
 /vagrant*
