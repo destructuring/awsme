@@ -20,49 +20,73 @@ require build
 # entry point
 function main {
   cd $shome
-  time build_vagrant
+  time build_virtualbox
 }
 
 function conf_virtualbox {
-  local nm_box="$1"; shift
+  local release_dir="$1"; shift
   local pth_script="$1"; shift
-  $shome/bin/cook -j <(echo '{"run_list": ["vagrant::virtualbox"], "vagrant": { "box": "'"$nm_box"'", "provision": { "shell": { "path": "'"$pth_script"'" }} }}')
+  local nm_box="$1"; shift
+  local tmp_dna="$(mktemp -t XXXXXXXXX)"
+  cat > "$tmp_dna" <<EOF
+  { 
+    "run_list": ["vagrant::virtualbox"], 
+    "vagrant": { 
+      "box": "$nm_box",
+      "provision": { "shell": { "path": "$pth_script" }},
+      "release_dir": "$release_dir"
+    }
+  }
+EOF
+  $shome/bin/cook -j "$tmp_dna"
+  rm -f "$tmp_dna"
 }
 
-function build_vagrant {
+function build_virtualbox {
+  local release_dir="$shome/vagrant-$(date +%Y%m%d-%H%M)"
+  mkdir -p $release_dir.{build,demo} # TODO move to tvd-vagrant
+
   local id_instance
 
-  # import ubuntu box and destroy lingering vagrant
-  bundle exec vagrant box add precise-server-cloudimg-amd64 $shome/boxes/precise-server-cloudimg-amd64-vagrant-disk1.box || true
-  conf_virtualbox "precise-server-cloudimg-amd64"
-  bundle exec vagrant destroy -f
+  # build keypair
+  # empty, just use the insecure vagrant key
 
-  # bootstrap until powered off
-  conf_virtualbox "precise-server-cloudimg-amd64" "$shome/bootstrap/ubuntu.sh"
-  bundle exec vagrant up
-  id_instance="$(cat $shome/.vagrant/machines/default/virtualbox/id)"
+  # import ubuntu box
+  bundle exec vagrant box add precise-server-cloudimg-amd64 $shome/boxes/precise-server-cloudimg-amd64-vagrant-disk1.box --provider virtualbox || true
+
+  # run the ubuntu bootstrap
+  conf_virtualbox "$release_dir.build" "$shome/bootstrap/ubuntu.sh" "precise-server-cloudimg-amd64"
+  (cd $release_dir.build && bundle exec vagrant up --provider virtualbox)
+  id_instance="$(cat $release_dir.build/.vagrant/machines/default/virtualbox/id)"
   until_vbox "poweroff"
 
-  # virtualbox guest additions with updated kernel
-  conf_virtualbox "precise-server-cloudimg-amd64" "$shome/bootstrap/virtualbox.sh"
-  bundle exec vagrant up
-  id_instance="$(cat $shome/.vagrant/machines/default/virtualbox/id)"
+  # detect early termination
+  # empty, not sure how to do this for virtualbox
+
+
+  # run virtualbox specific guest addition installer
+  conf_virtualbox "$release_dir.build" "$shome/bootstrap/virtualbox.sh" "precise-server-cloudimg-amd64"
+  (cd $release_dir.build && bundle exec vagrant up --provider virtualbox)
+  id_instance="$(cat $release_dir.build/.vagrant/machines/default/virtualbox/id)"
   until_vbox "poweroff"
 
-  # bundling
-  bundle exec vagrant package --output $shome/boxes/awsme.box.tmp
-  mv -f $shome/boxes/awsme.box.tmp $shome/boxes/awsme.box
-  bundle exec vagrant box remove awsme virtualbox || true
-  bundle exec vagrant box add awsme $shome/boxes/awsme.box
-  bundle exec vagrant destroy -f
+  # bundle box
+  (cd $release_dir.build && bundle exec vagrant package --output awsme.box)
+  (cd $release_dir.build && bundle exec vagrant box remove awsme virtualbox || true)
+  (cd $release_dir.build && bundle exec vagrant box add awsme awsme.box)
+  (cd $release_dir.build && bundle exec vagrant destroy -f)
 
-  # boot up new box
-  conf_virtualbox "awsme" "$shome/bootstrap/noop.sh"
-  bundle exec vagrant up
-  id_instance="$(cat $shome/.vagrant/machines/default/virtualbox/id)"
+  # demo new box
+  conf_virtualbox "$release_dir.demo" "$shome/bootstrap/noop.sh" "awsme"
+  (cd $release_dir.demo && bundle exec vagrant up --provider virtualbox)
+  id_instance="$(cat $release_dir.demo/.vagrant/machines/default/virtualbox/id)"
   until_vbox "running"
-  time until_port_open localhost "$(forwarded_ssh_port)"
-  bundle exec vagrant ssh
+  until_port_open localhost "$(forwarded_ssh_port)"
+  (cd $release_dir.demo && bundle exec vagrant ssh)
+  (cd $release_dir.build && bundle exec vagrant destroy -f)
+
+  # delete ssh keys
+  # empty
 }
 
 require sub "$BASH_SOURCE" "$@"
