@@ -25,13 +25,8 @@ function main {
 
 function conf_virtualbox {
   local nm_box="$1"; shift
-
-  if [[ "$#" = 0 ]]; then
-    $shome/bin/cook -j <(echo '{"run_list": ["vagrant::virtualbox"], "vagrant": { "box": "'"$nm_box"'" }}')
-  else
-    local pth_script="$1"; shift
-    $shome/bin/cook -j <(echo '{"run_list": ["vagrant::virtualbox"], "vagrant": { "box": "'"$nm_box"'", "provision": { "shell": { "path": "'"$pth_script"'" }} }}')
-  fi
+  local pth_script="$1"; shift
+  $shome/bin/cook -j <(echo '{"run_list": ["vagrant::virtualbox"], "vagrant": { "box": "'"$nm_box"'", "provision": { "shell": { "path": "'"$pth_script"'" }} }}')
 }
 
 function build_vagrant {
@@ -67,7 +62,7 @@ function build_vagrant {
   bundle exec vagrant destroy -f
 
   # boot up new box
-  conf_virtualbox "awsme"
+  conf_virtualbox "awsme" "$shome/bootstrap/noop.sh"
   bundle exec vagrant up
   id_instance="$(cat $shome/.vagrant/machines/default/virtualbox/id)"
   until_vbox "running"
