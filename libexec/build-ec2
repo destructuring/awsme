@@ -92,7 +92,7 @@ function build_aws {
   (cd $release_dir.demo && bundle exec vagrant up --provider aws)
   id_instance="$(cat $release_dir.demo/.vagrant/machines/default/aws/id)"
   (cd $release_dir.demo && bundle exec vagrant ssh)
-  (cd $release_dir.build && bundle exec vagrant destroy -f)
+  (cd $release_dir.demo && bundle exec vagrant destroy -f)
 
   # delete ssh keys
   ec2-delete-keypair --region $FLAGS_region $nm_keypair

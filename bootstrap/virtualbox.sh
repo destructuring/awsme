@@ -1,6 +1,8 @@
 #!/bin/bash -exfu
 
 function main {
+  local ver_vbox="$1"; shift
+
   export DEBIAN_FRONTEND="noninteractive"
 
   # remove crap from vagrant cloud images to match ec2
@@ -20,11 +22,11 @@ function main {
   # rebuild guest additions
   aptitude purge -y virtualbox-guest-{dkms,utils,x11}
 
-  cp /vagrant/boxes/VBoxGuestAdditions.iso ~/
-  mount -o loop ~/VBoxGuestAdditions.iso /mnt
+  wget http://download.virtualbox.org/virtualbox/${ver_vbox}/VBoxGuestAdditions_${ver_vbox}.iso
+  mount -o loop ~/VBoxGuestAdditions_${ver_vbox}.iso /mnt
   sh /mnt/VBoxLinuxAdditions.run
   umount /mnt
-  rm -f ~/VBoxGuestAdditions.iso
+  rm -f ~/VBoxGuestAdditions_${ver_vbox}.iso
 
   ### START finished.sh
   aptitude clean
@@ -39,6 +41,6 @@ function main {
   ### END finished.sh
 }
 
-exec > >(tee -a /var/log/awsme.log | logger -t awsme -s) 2>&1
+exec > >(tee -a /var/log/awsme.log | logger -t virtualbox -s) 2>&1
 
 main "$@"

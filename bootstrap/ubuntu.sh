@@ -44,7 +44,7 @@ function main {
   ### END finished.sh
 }
 
-exec > >(tee -a /var/log/awsme.log | logger -t awsme -s) 2>&1
+exec > >(tee -a /var/log/awsme.log | logger -t ubuntu -s) 2>&1
 
 # Stop instance before first hour, probably a runaway instance by then
 echo poweroff | at now + 50 minutes

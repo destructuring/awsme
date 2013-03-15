@@ -27,13 +27,16 @@ function conf_virtualbox {
   local release_dir="$1"; shift
   local pth_script="$1"; shift
   local nm_box="$1"; shift
+
+  local ver_vbox="$(VBoxManage --version | cut -dr -f1)"
+
   local tmp_dna="$(mktemp -t XXXXXXXXX)"
   cat > "$tmp_dna" <<EOF
   { 
     "run_list": ["vagrant::virtualbox"], 
     "vagrant": { 
       "box": "$nm_box",
-      "provision": { "shell": { "path": "$pth_script" }},
+      "provision": { "shell": { "path": "$pth_script", "args": "$ver_vbox" }},
       "release_dir": "$release_dir"
     }
   }
