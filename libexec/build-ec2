@@ -71,7 +71,7 @@ function build_aws {
   cd "$shome/vagrant.aws"
   bundle exec vagrant destroy -f || true
   bundle exec vagrant up --provider aws
-  local id_instance="$(cat $shome/vagrant.aws/.vagrant/machines/default/aws/id)"
+  id_instance="$(cat $shome/vagrant.aws/.vagrant/machines/default/aws/id)"
 
   # wait for script to finish
   until_ec2 "stopped" "terminated"
@@ -79,19 +79,28 @@ function build_aws {
   # detect early termination
   local status="$(instance_status)"
   if [[ "$status" = "terminated" ]]; then
-  logger_fatal "Instance terminated after bootstrap, expecting stopped"
+    logger_fatal "Instance terminated after bootstrap, expecting stopped"
     return 1
   fi
 
   # bundle ami
   local nm_ami=`date "+base_%Y-%m-%d-%H-%M"`
   local id_image="$(ec2-create-image --region "$FLAGS_region" -K $EC2_PRIVATE_KEY -C $EC2_CERT -n $nm_ami $id_instance | awk '$1 == "IMAGE" {print $2}')"
-  ec2-terminate-instances --region "$FLAGS_region" $id_instance
+  bundle exec vagrant destroy -f
   until_ami "$id_image" available
 
+  # test new ami
   cd "$shome"
+  conf_aws "$id_image" "$nm_keypair" "$shome/vagrant.aws/.id_rsa" "$shome/bootstrap/noop.sh"
+  rsync -ia "$shome/Vagrantfile" "$shome/vagrant.aws/Vagrantfile"
+
+  cd "$shome/vagrant.aws"
+  bundle exec vagrant up --provider aws
+  id_instance="$(cat $shome/vagrant.aws/.vagrant/machines/default/aws/id)"
+  bundle exec vagrant ssh
 
   # delete ssh keys
+  cd "$shome"
   ec2-delete-keypair --region $FLAGS_region $nm_keypair
 }
 
