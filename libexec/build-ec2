@@ -24,6 +24,7 @@ function main {
 }
 
 function conf_aws {
+  local release_dir="$1"; shift
   local id_ami="$1"; shift
   local nm_keypair="$1"; shift
   local pth_private_key_path="$1"; shift
@@ -44,7 +45,8 @@ function conf_aws {
       "ami": "$id_ami",
       "instance_type": "m1.large",
       "ssh_username": "ubuntu",
-      "ssh_private_key_path": "$pth_private_key_path"
+      "ssh_private_key_path": "$pth_private_key_path",
+      "release_dir": "$release_dir"
     }
   }
 EOF
@@ -53,25 +55,22 @@ EOF
 }
 
 function build_aws {
-  local id_instance
+  local release_dir="$shome/vagrant-$(date +%Y%m%d-%H%M)"
+  mkdir -p $release_dir.{build,demo} # TODO move to tvd-vagrant
 
-  mkdir -p "$shome/vagrant.aws"
+  local id_instance
 
   # build keypair
   local nm_keypair="tmp-build-ami-keypair-$(date +%s)-$$"
-  rm -f "$shome/vagrant.aws/.id_rsa"
-  ssh-keygen -N "" -f "$shome/vagrant.aws/.id_rsa"
-  ec2-import-keypair --region $FLAGS_region --public-key-file "$shome/vagrant.aws/.id_rsa.pub" $nm_keypair
+  ssh-keygen -N "" -f "$release_dir.build/.id_rsa"
+  ec2-import-keypair --region $FLAGS_region --public-key-file "$release_dir.build/.id_rsa.pub" $nm_keypair
 
   # import ubuntu box and destroy lingering vagrant
   bundle exec vagrant box add dummy $shome/boxes/dummy.box --provider aws || true
-  conf_aws "$(pick_ami)" "$nm_keypair" "$shome/vagrant.aws/.id_rsa" "$shome/bootstrap/ubuntu.sh"
-  rsync -ia "$shome/Vagrantfile" "$shome/vagrant.aws/Vagrantfile"
+  conf_aws "$release_dir.build" "$(pick_ami)" "$nm_keypair" "$release_dir.build/.id_rsa" "$shome/bootstrap/ubuntu.sh"
 
-  cd "$shome/vagrant.aws"
-  bundle exec vagrant destroy -f || true
-  bundle exec vagrant up --provider aws
-  id_instance="$(cat $shome/vagrant.aws/.vagrant/machines/default/aws/id)"
+  (cd $release_dir.build && bundle exec vagrant up --provider aws)
+  id_instance="$(cat $release_dir.build/.vagrant/machines/default/aws/id)"
 
   # wait for script to finish
   until_ec2 "stopped" "terminated"
@@ -86,18 +85,16 @@ function build_aws {
   # bundle ami
   local nm_ami=`date "+base_%Y-%m-%d-%H-%M"`
   local id_image="$(ec2-create-image --region "$FLAGS_region" -K $EC2_PRIVATE_KEY -C $EC2_CERT -n $nm_ami $id_instance | awk '$1 == "IMAGE" {print $2}')"
-  bundle exec vagrant destroy -f
+  (cd $release_dir.build && bundle exec vagrant destroy -f)
   until_ami "$id_image" available
 
   # test new ami
   cd "$shome"
-  conf_aws "$id_image" "$nm_keypair" "$shome/vagrant.aws/.id_rsa" "$shome/bootstrap/noop.sh"
-  rsync -ia "$shome/Vagrantfile" "$shome/vagrant.aws/Vagrantfile"
+  conf_aws "$release_dir.demo" "$id_image" "$nm_keypair" "$release_dir.build/.id_rsa" "$shome/bootstrap/noop.sh"
 
-  cd "$shome/vagrant.aws"
-  bundle exec vagrant up --provider aws
-  id_instance="$(cat $shome/vagrant.aws/.vagrant/machines/default/aws/id)"
-  bundle exec vagrant ssh
+  (cd $release_dir.demo && bundle exec vagrant up --provider aws)
+  id_instance="$(cat $release_dir.demo/.vagrant/machines/default/aws/id)"
+  (cd $release_dir.demo && bundle exec vagrant ssh)
 
   # delete ssh keys
   cd "$shome"
