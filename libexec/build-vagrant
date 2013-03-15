@@ -72,7 +72,7 @@ function build_vagrant {
   id_instance="$(cat $shome/.vagrant/machines/default/virtualbox/id)"
   until_vbox "running"
   time until_port_open localhost "$(forwarded_ssh_port)"
-  bundle exec vagrant ssh -- -l ubuntu
+  bundle exec vagrant ssh
 }
 
 require sub "$BASH_SOURCE" "$@"
