@@ -15,69 +15,13 @@ shome="$(cd -P -- "$(dirname -- "$BASH_SOURCE")/.." && pwd -P)"
 # load a jason bourne library
 source "$shome/libexec/_jason"
 require awsme
-
-DEFINE_boolean "virtualbox" "$FLAGS_FALSE" "Build a virtualbox"
-DEFINE_boolean "ec2" "$FLAGS_FALSE" "Build an ec2 instance"
+require build-virtualbox
+require build-clean
 
 # entry point
 function main {
   cd $shome
-
-  if [[ "$FLAGS_virtualbox" = "$FLAGS_TRUE" ]]; then
-    require build-virtualbox
-  elif [[ "$FLAGS_virtualbox" = "$FLAGS_TRUE" ]]; then
-    require build-ec2
-  else
-    logger_fatal "Specific --virtualbox or --ec2 build types"
-    exit 1
-  fi
-
-  require build-clean
-
   time build_vagrant "$@"
-}
-
-function conf_vagrant {
-  local release_dir="$1"; shift
-  local pth_script="$1"; shift
-  local nm_box="$1"; shift
-
-  local tmp_dna="$(mktemp -t XXXXXXXXX)"
-  cat > "$tmp_dna" <<EOF
-  { 
-    "run_list": ["vagrant::virtualbox"], 
-    "vagrant": { 
-      "box": "$nm_box",
-      "provision": { "shell": { "path": "$pth_script" }},
-      "release_dir": "$release_dir"
-    }
-  }
-EOF
-  $shome/bin/cook -j "$tmp_dna"
-  rm -f "$tmp_dna"
-}
-
-function build_vagrant {
-  local nm_build="$1"; shift
-  local pth_custom="$1"; shift
-
-  local release_dir="$shome/vagrant-${nm_build}-$(date +%Y%m%d-%H%M-$$)"
-  mkdir -p $release_dir # TODO move to tvd-vagrant
-
-  local id_instance
-
-  # boot up new box
-  conf_vagrant "$release_dir" "$shome/bootstrap/noop.sh" "awsme"
-  (cd $release_dir && bundle exec vagrant up --provider virtualbox)
-  id_instance="$(cat $release_dir/.vagrant/machines/default/virtualbox/id)"
-  until_vbox "running"
-  until_port_open localhost "$(forwarded_ssh_port)"
-
-  local tmp_ssh_config="$(mktemp -t XXXXXXXXX)"
-  (cd $release_dir && bundle exec vagrant ssh-config > "$tmp_ssh_config")
-
-  $pth_custom "$tmp_ssh_config" "$@"
-  rm -f "$tmp_ssh_config"
 }
 
 require sub "$BASH_SOURCE" "$@"

@@ -17,7 +17,7 @@ function until_vagrant {
 
   logger_info "until $wanted"
 
-  local id_instance="$(cat $release_dir.demo/.vagrant/machines/default/virtualbox/id)"
+  local id_instance="$(cat $release_dir/.vagrant/machines/default/virtualbox/id)"
   while true; do
     local current_state="$(vbox_state "$id_instance")"
     if [[ "$current_state" = "$wanted" ]]; then
@@ -30,7 +30,7 @@ function until_vagrant {
 }
 
 function forwarded_ssh_port {
-  local id_instance="$(cat $release_dir.demo/.vagrant/machines/default/virtualbox/id)"
+  local id_instance="$(cat $release_dir/.vagrant/machines/default/virtualbox/id)"
   VBoxManage showvminfo "$id_instance" --machinereadable | awk '$1 ~ /^Forwarding\(.*?,22"/ { split($1,a,","); print a[4] }'
 }
 
@@ -73,8 +73,8 @@ function import_ubuntu {
 }
 
 function bootstrap_ubuntu {
-  conf_vagrant "$release_dir.build" "$FLAGS_bootstrap" "$FLAGS_boxname"
-  (cd $release_dir.build && bundle exec vagrant up --provider virtualbox)
+  conf_vagrant "$release_dir" "$FLAGS_bootstrap" "$FLAGS_boxname"
+  (cd $release_dir && bundle exec vagrant up --provider virtualbox)
   until_vagrant "poweroff"
 }
 
@@ -84,27 +84,32 @@ function early_termination {
 
 function build_specific {
   # run virtualbox specific guest addition installer
-  conf_vagrant "$release_dir.build" "$shome/bootstrap/virtualbox.sh" "$FLAGS_boxname"
-  (cd $release_dir.build && bundle exec vagrant up --provider virtualbox)
+  conf_vagrant "$release_dir" "$shome/bootstrap/virtualbox.sh" "$FLAGS_boxname"
+  (cd $release_dir && bundle exec vagrant up --provider virtualbox)
   until_vagrant "poweroff"
 }
 
 function bundle_vagrant {
-  (cd $release_dir.build && bundle exec vagrant package --output ${FLAGS_newname}.box)
-  (cd $release_dir.build && bundle exec vagrant box remove ${FLAGS_newname} virtualbox || true)
-  (cd $release_dir.build && bundle exec vagrant box add ${FLAGS_newname} ${FLAGS_newname}.box)
-  (cd $release_dir.build && bundle exec vagrant destroy -f)
+  {
+    (cd $release_dir && bundle exec vagrant package --output ${FLAGS_newname}.box)
+    (cd $release_dir && bundle exec vagrant box remove ${FLAGS_newname} virtualbox || true)
+    (cd $release_dir && bundle exec vagrant box add ${FLAGS_newname} ${FLAGS_newname}.box)
+    (cd $release_dir && bundle exec vagrant destroy -f)
+  } 1>&2
 }
 
 function demo_vagrant {
-  conf_vagrant "$release_dir.demo" "$shome/bootstrap/noop.sh" "${FLAGS_newname}"
-  (cd $release_dir.demo && bundle exec vagrant up --provider virtualbox)
+  local nm_keypair="$1"; shift
+  local id_image="$1"; shift
+
+  conf_vagrant "$release_dir" "$shome/bootstrap/noop.sh" "${FLAGS_newname}"
+  (cd $release_dir && bundle exec vagrant up --provider virtualbox)
   until_vagrant "running"
   until_port_open localhost "$(forwarded_ssh_port)"
   demo_in_vagrant "$@"
-  (cd $release_dir.build && bundle exec vagrant destroy -f)
+  (cd $release_dir && bundle exec vagrant destroy -f)
 }
 
 function demo_in_vagrant {
-  (cd $release_dir.demo && bundle exec vagrant ssh)
+  (cd $release_dir && bundle exec vagrant ssh)
 }

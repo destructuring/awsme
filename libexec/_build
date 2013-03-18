@@ -27,15 +27,15 @@ function until_port_open {
 function build_vagrant {
   local release_dir="$shome/vagrant-$(build_type)-$(date +%Y%m%d-%H%M-$$)"
 
-  mkdir -p $release_dir.{build,demo} # TODO move to tvd-vagrant
+  mkdir -p $release_dir
 
   local nm_keypair="$(build_keypair)"
   
   import_ubuntu
   bootstrap_ubuntu "$nm_keypair"
   early_termination
-  bundle_vagrant
-  demo_vagrant "$nm_keypair" "$@"
+  local id_image="$(bundle_vagrant)"
+  demo_vagrant "$nm_keypair" "$id_image" "$@"
 
   delete_keypair "$nm_keypair"
 }
