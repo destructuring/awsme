@@ -22,3 +22,5 @@ function main {
   cd $shome
   time build_vagrant
 }
+
+main "$@"

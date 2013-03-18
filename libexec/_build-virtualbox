@@ -73,7 +73,7 @@ function import_ubuntu {
 }
 
 function bootstrap_ubuntu {
-  conf_vagrant "$release_dir.build" "$FLAGS_boostrap" "$FLAGS_boxname"
+  conf_vagrant "$release_dir.build" "$FLAGS_bootstrap" "$FLAGS_boxname"
   (cd $release_dir.build && bundle exec vagrant up --provider virtualbox)
   until_vagrant "poweroff"
 }
