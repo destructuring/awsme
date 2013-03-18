@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function demo_in_vagrant {
-  local pth_custom="${@:$(($#-1))}"
+  local pth_custom="${@:$(($#))}"
 
   local tmp_ssh_config="$(mktemp -t XXXXXXXXX)"
   (cd $release_dir && bundle exec vagrant ssh-config > "$tmp_ssh_config")
