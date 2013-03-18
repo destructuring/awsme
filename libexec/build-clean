@@ -23,17 +23,44 @@ function main {
   time build_clean "$@"
 }
 
+function conf_virtualbox {
+  local release_dir="$1"; shift
+  local pth_script="$1"; shift
+  local nm_box="$1"; shift
+
+  local ver_vbox="$(VBoxManage --version | cut -dr -f1)"
+
+  local tmp_dna="$(mktemp -t XXXXXXXXX)"
+  cat > "$tmp_dna" <<EOF
+  { 
+    "run_list": ["vagrant::virtualbox"], 
+    "vagrant": { 
+      "box": "$nm_box",
+      "provision": { "shell": { "path": "$pth_script", "args": "$ver_vbox" }},
+      "release_dir": "$release_dir"
+    }
+  }
+EOF
+  $shome/bin/cook -j "$tmp_dna"
+  rm -f "$tmp_dna"
+}
+
 function build_clean {
+  local release_dir="$shome/vagrant-$(date +%Y%m%d-%H%M-$$)"
+  mkdir -p $release_dir # TODO move to tvd-vagrant
+
+  local id_instance
+
   # boot up new box
-  bin/cook -j <(echo '{"run_list": ["vagrant"], "vagrant": { "box": "awsme" }}')
-  bundle exec vagrant destroy -f || true
-  bundle exec vagrant up
-  local id_instance="$(cat $shome/.vagrant/machines/default/virtualbox/id)"
+  conf_virtualbox "$release_dir" "$shome/bootstrap/noop.sh" "awsme"
+  (cd $release_dir && bundle exec vagrant up --provider virtualbox)
+  id_instance="$(cat $release_dir/.vagrant/machines/default/virtualbox/id)"
   until_vbox "running"
-  time until_port_open localhost "$(forwarded_ssh_port)"
+  until_port_open localhost "$(forwarded_ssh_port)"
 
   local tmp_ssh_config="$(mktemp -t XXXXXXXXX)"
-  bundle exec vagrant ssh-config > "$tmp_ssh_config"
+  (cd $release_dir && bundle exec vagrant ssh-config > "$tmp_ssh_config")
+
   local pth_custom="$1"; shift
   $pth_custom "$tmp_ssh_config" "$@"
   rm -f "$tmp_ssh_config"
