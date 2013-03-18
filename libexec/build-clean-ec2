@@ -1,0 +1,31 @@
+#!/bin/bash
+
+#/ NAME
+#/     build clean -- builds a clean vagrant box based on awsme with customizations
+#/
+#/ SYNOPSIS
+#/   bin/build clean
+#/
+#/ EXAMPLES
+#/     $ bin/build clean
+
+# figure out the project root under which bin, lib live
+shome="$(cd -P -- "$(dirname -- "$BASH_SOURCE")/.." && pwd -P)"
+
+# load a jason bourne library
+source "$shome/libexec/_jason"
+require awsme
+require build-ec2
+require build-clean
+
+# entry point
+function main {
+  cd $shome
+  time build_vagrant "$@"
+}
+
+function clean_id_image {
+  echo "${FLAGS_ami:-"$(pick_ami)"}"
+}
+
+require sub "$BASH_SOURCE" "$@"
