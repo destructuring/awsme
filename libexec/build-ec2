@@ -15,95 +15,10 @@ shome="$(cd -P -- "$(dirname -- "$BASH_SOURCE")/.." && pwd -P)"
 # load a jason bourne library
 source "$shome/libexec/_jason"
 require awsme
-require build
+require build-ec2
 
 # entry point
 function main {
   cd $shome
-  time build_aws
+  time build_vagrant
 }
-
-function conf_aws {
-  local release_dir="$1"; shift
-  local pth_script="$1"; shift
-  local nm_box="dummy"
-  local id_ami="$1"; shift
-  local nm_keypair="$1"; shift
-  local pth_private_key_path="$1"; shift
-
-
-  local tmp_dna="$(mktemp -t XXXXXXXXX)"
-  cat > "$tmp_dna" <<EOF
-  { 
-    "run_list": ["vagrant::aws"], 
-    "vagrant": { 
-      "box": "$nm_box",
-      "provision": { "shell": { "path": "$pth_script" }},
-      "release_dir": "$release_dir",
-      "access_key_id": "$AWS_ACCESS_KEY",
-      "secret_access_key": "$AWS_SECRET_KEY",
-      "keypair_name": "$nm_keypair",
-      "ami": "$id_ami",
-      "instance_type": "m1.large",
-      "ssh_username": "ubuntu",
-      "ssh_private_key_path": "$pth_private_key_path"
-    }
-  }
-EOF
-  $shome/bin/cook -j "$tmp_dna"
-  rm -f "$tmp_dna"
-}
-
-function build_aws {
-  local release_dir="$shome/vagrant-ec2-$(date +%Y%m%d-%H%M-$$)"
-  mkdir -p $release_dir.{build,demo} # TODO move to tvd-vagrant
-
-  local id_instance
-
-  # build keypair
-  local nm_keypair="tmp-build-ami-keypair-$(date +%s)-$$"
-  ssh-keygen -N "" -f "$release_dir.build/.id_rsa"
-  ec2-import-keypair --region $FLAGS_region --public-key-file "$release_dir.build/.id_rsa.pub" $nm_keypair
-
-  # import ubuntu box
-  bundle exec vagrant box add dummy $shome/boxes/dummy.box --provider aws || true
-
-  # run the ubuntu bootstrap
-  conf_aws "$release_dir.build" "$shome/bootstrap/ubuntu.sh" "$(pick_ami)" "$nm_keypair" "$release_dir.build/.id_rsa"
-  (cd $release_dir.build && bundle exec vagrant up --provider aws)
-  id_instance="$(cat $release_dir.build/.vagrant/machines/default/aws/id)"
-  until_ec2 "stopped" "terminated"
-
-  # detect early termination
-  local status="$(instance_status)"
-  if [[ "$status" = "terminated" ]]; then
-    logger_fatal "Instance terminated after bootstrap, expecting stopped"
-    return 1
-  fi
-
-  # bundle ami
-  local nm_ami=`date "+base_%Y-%m-%d-%H-%M"`
-  local id_image="$(ec2-create-image --region "$FLAGS_region" -K $EC2_PRIVATE_KEY -C $EC2_CERT -n $nm_ami $id_instance | awk '$1 == "IMAGE" {print $2}')"
-  until_ami "$id_image" available
-  (cd $release_dir.build && bundle exec vagrant destroy -f)
-
-  # demo new ami
-  conf_aws "$release_dir.demo" "$shome/bootstrap/noop.sh" "$id_image" "$nm_keypair" "$release_dir.build/.id_rsa"
-  (cd $release_dir.demo && bundle exec vagrant up --provider aws)
-  id_instance="$(cat $release_dir.demo/.vagrant/machines/default/aws/id)"
-  (cd $release_dir.demo && bundle exec vagrant ssh)
-  (cd $release_dir.demo && bundle exec vagrant destroy -f)
-
-  # delete ssh keys
-  ec2-delete-keypair --region $FLAGS_region $nm_keypair
-}
-
-function instance_status {
-  ec2-describe-instances --region "$FLAGS_region" "$id_instance" | awk '$1 == "INSTANCE" { print $4 }'
-}
-
-function image_status {
-  ec2-describe-images --region "$FLAGS_region" "$id_image" | awk '$1 == "IMAGE" { print $5 }'
-}
-
-require sub "$BASH_SOURCE" "$@"

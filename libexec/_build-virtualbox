@@ -1,0 +1,110 @@
+#!/bin/bash
+
+require build
+
+DEFINE_string "newname" "awsme" "New Vagrant box name"
+DEFINE_string "boxname" "precise-server-cloudimg-amd64" "Vagrant box name"
+DEFINE_string "vagrantbox" "$shome/boxes/precise-server-cloudimg-amd64-vagrant-disk1.box" "Vagrant box path"
+DEFINE_string "bootstrap" "$shome/bootstrap/ubuntu.sh" "Initial bootstrap script" 
+
+function vbox_state {
+  local id_instance="$1"; shift
+  VBoxManage showvminfo "$id_instance" --machinereadable | awk '$1 ~ /^VMState=/ { split($1,a,"="); split(a[2],b,"\""); print b[2] }'
+}
+
+function until_vagrant {
+  local wanted="$1"; shift
+
+  logger_info "until $wanted"
+
+  local id_instance="$(cat $release_dir.demo/.vagrant/machines/default/virtualbox/id)"
+  while true; do
+    local current_state="$(vbox_state "$id_instance")"
+    if [[ "$current_state" = "$wanted" ]]; then
+      echo
+      break
+    fi
+    echo -n "."
+    sleep 5
+  done
+}
+
+function forwarded_ssh_port {
+  local id_instance="$(cat $release_dir.demo/.vagrant/machines/default/virtualbox/id)"
+  VBoxManage showvminfo "$id_instance" --machinereadable | awk '$1 ~ /^Forwarding\(.*?,22"/ { split($1,a,","); print a[4] }'
+}
+
+function conf_vagrant {
+  local release_dir="$1"; shift
+  local pth_script="$1"; shift
+  local nm_box="$1"; shift
+
+  local ver_vbox="$(VBoxManage --version | cut -dr -f1)"
+
+  local tmp_dna="$(mktemp -t XXXXXXXXX)"
+  cat > "$tmp_dna" <<EOF
+  { 
+    "run_list": ["vagrant::virtualbox"], 
+    "vagrant": { 
+      "box": "$nm_box",
+      "provision": { "shell": { "path": "$pth_script", "args": "$ver_vbox" }},
+      "release_dir": "$release_dir"
+    }
+  }
+EOF
+  $shome/bin/cook -j "$tmp_dna"
+  rm -f "$tmp_dna"
+}
+
+function build_type {
+  echo "virtualbox"
+}
+
+function build_keypair {
+  true
+}
+
+function delete_keypair {
+  true
+}
+
+function import_ubuntu {
+  bundle exec vagrant box add "$FLAGS_boxname" "$FLAGS_vagrantbox" --provider virtualbox || true
+}
+
+function bootstrap_ubuntu {
+  conf_vagrant "$release_dir.build" "$FLAGS_boostrap" "$FLAGS_boxname"
+  (cd $release_dir.build && bundle exec vagrant up --provider virtualbox)
+  until_vagrant "poweroff"
+}
+
+function early_termination {
+  true
+}
+
+function build_specific {
+  # run virtualbox specific guest addition installer
+  conf_vagrant "$release_dir.build" "$shome/bootstrap/virtualbox.sh" "$FLAGS_boxname"
+  (cd $release_dir.build && bundle exec vagrant up --provider virtualbox)
+  until_vagrant "poweroff"
+}
+
+function bundle_vagrant {
+  (cd $release_dir.build && bundle exec vagrant package --output ${FLAGS_newname}.box)
+  (cd $release_dir.build && bundle exec vagrant box remove ${FLAGS_newname} virtualbox || true)
+  (cd $release_dir.build && bundle exec vagrant box add ${FLAGS_newname} ${FLAGS_newname}.box)
+  (cd $release_dir.build && bundle exec vagrant destroy -f)
+}
+
+function demo_vagrant {
+  conf_vagrant "$release_dir.demo" "$shome/bootstrap/noop.sh" "${FLAGS_newname}"
+  (cd $release_dir.demo && bundle exec vagrant up --provider virtualbox)
+  until_vagrant "running"
+  until_port_open localhost "$(forwarded_ssh_port)"
+  demo_in_vagrant "$@"
+  (cd $release_dir.build && bundle exec vagrant destroy -f)
+}
+
+function demo_in_vagrant {
+  (cd $release_dir.demo && bundle exec vagrant ssh)
+}

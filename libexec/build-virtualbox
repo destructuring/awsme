@@ -15,81 +15,11 @@ shome="$(cd -P -- "$(dirname -- "$BASH_SOURCE")/.." && pwd -P)"
 # load a jason bourne library
 source "$shome/libexec/_jason"
 require awsme
-require build
+require build-virtualbox
 
 # entry point
 function main {
   cd $shome
-  time build_virtualbox
+  time build_vagrant
 }
 
-function conf_virtualbox {
-  local release_dir="$1"; shift
-  local pth_script="$1"; shift
-  local nm_box="$1"; shift
-
-  local ver_vbox="$(VBoxManage --version | cut -dr -f1)"
-
-  local tmp_dna="$(mktemp -t XXXXXXXXX)"
-  cat > "$tmp_dna" <<EOF
-  { 
-    "run_list": ["vagrant::virtualbox"], 
-    "vagrant": { 
-      "box": "$nm_box",
-      "provision": { "shell": { "path": "$pth_script", "args": "$ver_vbox" }},
-      "release_dir": "$release_dir"
-    }
-  }
-EOF
-  $shome/bin/cook -j "$tmp_dna"
-  rm -f "$tmp_dna"
-}
-
-function build_virtualbox {
-  local release_dir="$shome/vagrant-virtualbox-$(date +%Y%m%d-%H%M-$$)"
-  mkdir -p $release_dir.{build,demo} # TODO move to tvd-vagrant
-
-  local id_instance
-
-  # build keypair
-  # empty, just use the insecure vagrant key
-
-  # import ubuntu box
-  bundle exec vagrant box add precise-server-cloudimg-amd64 $shome/boxes/precise-server-cloudimg-amd64-vagrant-disk1.box --provider virtualbox || true
-
-  # run the ubuntu bootstrap
-  conf_virtualbox "$release_dir.build" "$shome/bootstrap/ubuntu.sh" "precise-server-cloudimg-amd64"
-  (cd $release_dir.build && bundle exec vagrant up --provider virtualbox)
-  id_instance="$(cat $release_dir.build/.vagrant/machines/default/virtualbox/id)"
-  until_vbox "poweroff"
-
-  # detect early termination
-  # empty, not sure how to do this for virtualbox
-
-
-  # run virtualbox specific guest addition installer
-  conf_virtualbox "$release_dir.build" "$shome/bootstrap/virtualbox.sh" "precise-server-cloudimg-amd64"
-  (cd $release_dir.build && bundle exec vagrant up --provider virtualbox)
-  id_instance="$(cat $release_dir.build/.vagrant/machines/default/virtualbox/id)"
-  until_vbox "poweroff"
-
-  # bundle box
-  (cd $release_dir.build && bundle exec vagrant package --output awsme.box)
-  (cd $release_dir.build && bundle exec vagrant box remove awsme virtualbox || true)
-  (cd $release_dir.build && bundle exec vagrant box add awsme awsme.box)
-  (cd $release_dir.build && bundle exec vagrant destroy -f)
-
-  # demo new box
-  conf_virtualbox "$release_dir.demo" "$shome/bootstrap/noop.sh" "awsme"
-  (cd $release_dir.demo && bundle exec vagrant up --provider virtualbox)
-  id_instance="$(cat $release_dir.demo/.vagrant/machines/default/virtualbox/id)"
-  until_vbox "running"
-  until_port_open localhost "$(forwarded_ssh_port)"
-  (cd $release_dir.demo && bundle exec vagrant ssh)
-  (cd $release_dir.build && bundle exec vagrant destroy -f)
-
-  # delete ssh keys
-  # empty
-}
-
-require sub "$BASH_SOURCE" "$@"

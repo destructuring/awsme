@@ -8,19 +8,6 @@ DEFINE_string 'instype' 'm1.large' "AWS instance type" "T"
 DEFINE_string 'release' 'precise' 'Ubuntu release' 'U'
 DEFINE_string 'sshauth' "$HOME/.ssh/authorized_keys" 'Authorized ssh keys' 's'
 
-function pick_ami {
-	# This selects the most recent release Ubuntu cloud image
-  curl -s http://cloud-images.ubuntu.com/rss/${FLAGS_release}-release.xml | \
-    awk '$1 ~ /^<br>/ { sub(/^<br>/, "", $0); print }' | \
-    awk -v region="$FLAGS_region" -v disk="$FLAGS_disk" -v arch="$FLAGS_arch" '$1 == region && $3 == arch && $4 == disk { ami = $2 } END { print ami }'
-}
-
-function vbox_state {
-  local id_instance="$1"; shift
-
-  VBoxManage showvminfo "$id_instance" --machinereadable | awk '$1 ~ /^VMState=/ { split($1,a,"="); split(a[2],b,"\""); print b[2] }'
-}
-
 function until_port_open {
   local address="$1"; shift
   local port="$1"; shift
@@ -37,86 +24,18 @@ function until_port_open {
   done
 }
 
-function until_vbox {
-  local wanted="$1"; shift
+function build_vagrant {
+  local release_dir="$shome/vagrant-$(build_type)-$(date +%Y%m%d-%H%M-$$)"
 
-  logger_info "until $wanted"
+  mkdir -p $release_dir.{build,demo} # TODO move to tvd-vagrant
 
-  while true; do
-    local current_state="$(vbox_state "$id_instance")"
-    if [[ "$current_state" = "$wanted" ]]; then
-      echo
-      break
-    fi
-    echo -n "."
-    sleep 5
-  done
-}
-
-function while_ec2 {
-  logger_info "while $@"
-
-  while true; do
-    local status="$(instance_status)"
-
-    local wanted
-    for wanted in "$@"; do
-      if [[ "$status" = "$wanted" || -z "$status" ]]; then
-        echo -n "."
-        sleep 5
-        continue 2
-      fi
-    done
-
-    break
-  done
+  local nm_keypair="$(build_keypair)"
   
-  echo
-}
+  import_ubuntu
+  bootstrap_ubuntu "$nm_keypair"
+  early_termination
+  bundle_vagrant
+  demo_vagrant "$nm_keypair" "$@"
 
-function until_ec2 {
-  logger_info "waiting for $@"
-
-  while true; do
-    local status="$(instance_status)"
-
-    local wanted
-    for wanted in "$@"; do
-      if [[ "$status" = "$wanted" ]]; then
-        break 2
-      fi
-    done
-    echo -n "."
-    sleep 5
-  done
-
-  echo
-}
-
-function until_ami {
-  logger_info "waiting for $@"
-
-  local id_ami="$1"; shift
-
-  while true; do
-    local status="$(image_status "$id_ami")"
-
-    local wanted
-    for wanted in "$@"; do
-      if [[ "$status" = "$wanted" ]]; then
-        break 2
-      elif [[ "$status" = "failed" ]]; then
-        logger_fatal "ami failed to bundle"
-        exit 1
-      fi
-    done
-    echo -n "."
-    sleep 5
-  done
-
-  echo
-}
-
-function forwarded_ssh_port {
-  VBoxManage showvminfo "$id_instance" --machinereadable | awk '$1 ~ /^Forwarding\(.*?,22"/ { split($1,a,","); print a[4] }'
+  delete_keypair "$nm_keypair"
 }

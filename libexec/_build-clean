@@ -1,0 +1,24 @@
+#!/bin/bash
+
+function bootstrap_ubuntu {
+  true
+}
+
+function early_termination {
+  true
+}
+
+function build_specific {
+}
+
+function bundle_vagrant {
+}
+
+function demo_in_vagrant {
+  local pth_custom="$1"; shift
+
+  local tmp_ssh_config="$(mktemp -t XXXXXXXXX)"
+  (cd $release_dir && bundle exec vagrant ssh-config > "$tmp_ssh_config")
+  $pth_custom "$tmp_ssh_config" "$@"
+  rm -f "$tmp_ssh_config"
+}

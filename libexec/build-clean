@@ -15,20 +15,32 @@ shome="$(cd -P -- "$(dirname -- "$BASH_SOURCE")/.." && pwd -P)"
 # load a jason bourne library
 source "$shome/libexec/_jason"
 require awsme
-require build
+
+DEFINE_boolean "virtualbox" "$FLAGS_FALSE" "Build a virtualbox"
+DEFINE_boolean "ec2" "$FLAGS_FALSE" "Build an ec2 instance"
 
 # entry point
 function main {
   cd $shome
-  time build_clean "$@"
+
+  if [[ "$FLAGS_virtualbox" = "$FLAGS_TRUE" ]]; then
+    require build-virtualbox
+  elif [[ "$FLAGS_virtualbox" = "$FLAGS_TRUE" ]]; then
+    require build-ec2
+  else
+    logger_fatal "Specific --virtualbox or --ec2 build types"
+    exit 1
+  fi
+
+  require build-clean
+
+  time build_vagrant "$@"
 }
 
-function conf_virtualbox {
+function conf_vagrant {
   local release_dir="$1"; shift
   local pth_script="$1"; shift
   local nm_box="$1"; shift
-
-  local ver_vbox="$(VBoxManage --version | cut -dr -f1)"
 
   local tmp_dna="$(mktemp -t XXXXXXXXX)"
   cat > "$tmp_dna" <<EOF
@@ -36,7 +48,7 @@ function conf_virtualbox {
     "run_list": ["vagrant::virtualbox"], 
     "vagrant": { 
       "box": "$nm_box",
-      "provision": { "shell": { "path": "$pth_script", "args": "$ver_vbox" }},
+      "provision": { "shell": { "path": "$pth_script" }},
       "release_dir": "$release_dir"
     }
   }
@@ -45,7 +57,7 @@ EOF
   rm -f "$tmp_dna"
 }
 
-function build_clean {
+function build_vagrant {
   local nm_build="$1"; shift
   local pth_custom="$1"; shift
 
@@ -55,7 +67,7 @@ function build_clean {
   local id_instance
 
   # boot up new box
-  conf_virtualbox "$release_dir" "$shome/bootstrap/noop.sh" "awsme"
+  conf_vagrant "$release_dir" "$shome/bootstrap/noop.sh" "awsme"
   (cd $release_dir && bundle exec vagrant up --provider virtualbox)
   id_instance="$(cat $release_dir/.vagrant/machines/default/virtualbox/id)"
   until_vbox "running"
