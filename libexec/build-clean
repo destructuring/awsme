@@ -46,7 +46,8 @@ EOF
 }
 
 function build_clean {
-  local release_dir="$shome/vagrant-$(date +%Y%m%d-%H%M-$$)"
+  local nm_build="$1"; shift
+  local release_dir="$shome/vagrant-${nm_build}-$(date +%Y%m%d-%H%M-$$)"
   mkdir -p $release_dir # TODO move to tvd-vagrant
 
   local id_instance
