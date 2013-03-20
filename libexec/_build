@@ -7,8 +7,8 @@ DEFINE_string 'arch' 'amd64' 'AWS arch'
 DEFINE_string 'instype' 'm1.large' "AWS instance type"
 DEFINE_string 'release' 'precise' 'Ubuntu release'
 DEFINE_string 'sshauth' "$HOME/.ssh/authorized_keys" 'Authorized ssh keys'
-DFINE_boolean 'demo' "$FLAGS_FALSE" "Launch a demo instance and ssh in"
-DFINE_string 'sshopts' "" "ssh options during a demo"
+DEFINE_boolean 'demo' "$FLAGS_FALSE" "Launch a demo instance and ssh in"
+DEFINE_string 'sshopts' "" "ssh options during a demo"
 
 function until_port_open {
   local address="$1"; shift
