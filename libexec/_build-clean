@@ -16,7 +16,6 @@ function build_vagrant {
 
   local nm_keypair="$(build_keypair)"
   
-  import_ubuntu
   local id_image="$(clean_id_image)"
   demo_vagrant "$nm_keypair" "$id_image" "$@"
 }

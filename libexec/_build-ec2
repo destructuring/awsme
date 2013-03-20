@@ -137,10 +137,6 @@ function delete_keypair {
   ec2-delete-keypair --region $FLAGS_region $nm_keypair
 }
 
-function import_ubuntu {
-  bundle exec vagrant box add dummy $shome/boxes/dummy.box --provider aws || true
-} 
-
 function bootstrap_ubuntu {
   local nm_keypair="$1"; shift
 

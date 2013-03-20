@@ -33,7 +33,6 @@ function build_vagrant {
 
   local nm_keypair="$(build_keypair)"
   
-  import_ubuntu
   bootstrap_ubuntu "$nm_keypair"
   early_termination
   local id_image="$(bundle_vagrant)"

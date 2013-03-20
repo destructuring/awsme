@@ -68,10 +68,6 @@ function delete_keypair {
   true
 }
 
-function import_ubuntu {
-  bundle exec vagrant box add "$FLAGS_boxname" "$FLAGS_vagrantbox" --provider virtualbox || true
-}
-
 function bootstrap_ubuntu {
   conf_vagrant "$release_dir" "$FLAGS_bootstrap" "$FLAGS_boxname"
   (cd $release_dir && bundle exec vagrant up --provider virtualbox)
