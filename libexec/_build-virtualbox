@@ -3,6 +3,7 @@
 require build
 
 DEFINE_string "newname" "awsme" "New Vagrant box name"
+DEFINE_string "output" "" "Bundled box name"
 DEFINE_string "boxname" "precise-server-cloudimg-amd64" "Vagrant box name"
 DEFINE_string "vagrantbox" "$shome/boxes/precise-server-cloudimg-amd64-vagrant-disk1.box" "Vagrant box path"
 DEFINE_string "bootstrap" "$shome/bootstrap/ubuntu.sh" "Initial bootstrap script" 
@@ -90,10 +91,16 @@ function build_specific {
 }
 
 function bundle_vagrant {
+  if [[ -z "${FLAGS_output}" ]]; then
+    FLAGS_output="$FLAGS_newname}.box"
+  fi
+
   {
-    (cd $release_dir && bundle exec vagrant package --output ${FLAGS_newname}.box)
-    (cd $release_dir && bundle exec vagrant box remove ${FLAGS_newname} virtualbox || true)
-    (cd $release_dir && bundle exec vagrant box add ${FLAGS_newname} ${FLAGS_newname}.box)
+    (cd $release_dir && bundle exec vagrant package --output "${FLAGS_output}")
+    if [[ -n "${FLAGS_newname}" ]]; then
+      (cd $release_dir && bundle exec vagrant box remove ${FLAGS_newname} virtualbox || true)
+      (cd $release_dir && bundle exec vagrant box add ${FLAGS_newname} ${FLAGS_newname}.box)
+    fi
     (cd $release_dir && bundle exec vagrant destroy -f)
   } 1>&2
 }
