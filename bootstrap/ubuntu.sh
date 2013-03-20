@@ -13,15 +13,22 @@ function main {
 
   # basic packages
   aptitude -y install wget curl netcat git rsync make
-  aptitude -y install dkms
 
   # unecessary daemons
   aptitude -y purge whoopsie acpid nfs-common rpcbind
 
   # ruby
   aptitude -y install ruby rdoc ri irb rubygems ruby-dev 
-
   gem install bundler --no-ri --no-rdoc -v '~> 1.2.5'
+
+  # awsme
+  sudo aptitude install -y libxslt1-dev
+
+  # aws
+  sudo aptitude install -y openjdk-7-jre-headless
+
+  # virtualbox
+  aptitude -y install dkms
 
   # don't start getty
   for a in $(set +f; cd /etc/init && ls -d tty*.conf); do
