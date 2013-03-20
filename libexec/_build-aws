@@ -80,6 +80,10 @@ function until_ami {
 }
 
 function instance_status {
+  if [[ ! -f "$release_dir/.vagrant/machines/default/aws/id" ]]; then
+    echo "null"
+  fi
+
   id_instance="$(cat $release_dir/.vagrant/machines/default/aws/id)"
   ec2-describe-instances --region "$FLAGS_region" "$id_instance" | awk '$1 == "INSTANCE" { print $4 }'
 }
@@ -142,13 +146,16 @@ function bootstrap_ubuntu {
 
   conf_vagrant "$release_dir" "$FLAGS_bootstrap" "${FLAGS_ami:-$(pick_ami)}" "$nm_keypair" "$release_dir/.id_rsa"
   (cd $release_dir && bundle exec vagrant up --provider aws)
-  until_vagrant "stopped" "terminated"
+  until_vagrant "stopped" "terminated" "null"
 } 
 
 function early_termination {
   local status="$(instance_status)"
   if [[ "$status" = "terminated" ]]; then
     logger_fatal "Instance terminated after bootstrap, expecting stopped"
+    return 1
+  elif [[ "$status" = "null" ]]; then
+    logger_fatal "Instance didn't start"
     return 1
   fi
 } 

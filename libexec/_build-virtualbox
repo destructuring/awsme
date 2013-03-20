@@ -12,10 +12,11 @@ function until_vagrant {
 
   logger_info "until $wanted"
 
-  local id_instance="$(cat $release_dir/.vagrant/machines/default/virtualbox/id)"
-  if [[ -z "$id_instance" ]]; then
+  if [[ ! -f $release_dir/.vagrant/machines/default/virtualbox/id ]]; then
     return 1
   fi
+
+  local id_instance="$(cat $release_dir/.vagrant/machines/default/virtualbox/id)"
 
   while true; do
     local current_state="$(vbox_state "$id_instance")"
