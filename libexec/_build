@@ -43,4 +43,5 @@ function build_vagrant {
   fi
 
   delete_keypair "$nm_keypair"
+  rm -rf "$release_dir"
 }
