@@ -94,7 +94,7 @@ function bundle_vagrant {
     (cd $release_dir && bundle exec vagrant package --output ${FLAGS_output})
     (cd $release_dir && bundle exec vagrant destroy -f)
 
-    if [[ "$FLAGS_demo" = "$FLAGS_TRUE" ]]l; then
+    if [[ "$FLAGS_demo" = "$FLAGS_TRUE" ]]; then
       FLAGS_tmpname="$nm_random"
       bundle exec vagrant box add ${FLAGS_tmpname} ${FLAGS_output}
     fi
