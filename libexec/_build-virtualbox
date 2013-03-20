@@ -87,9 +87,12 @@ function build_specific {
 
 function bundle_vagrant {
   local nm_random="demo-$$-$RANDOM"
+
   if [[ -z "$FLAGS_output" ]]; then
     FLAGS_output="$shome/${nm_random}.box"
   fi
+
+  rm -f "$FLAGS_output"
   {
     (cd $release_dir && bundle exec vagrant package --output ${FLAGS_output})
     (cd $release_dir && bundle exec vagrant destroy -f)
@@ -99,6 +102,8 @@ function bundle_vagrant {
       bundle exec vagrant box add ${FLAGS_tmpname} ${FLAGS_output}
     fi
   } 1>&2
+
+  echo "$nm_random"
 }
 
 function demo_vagrant {
