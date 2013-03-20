@@ -2,10 +2,11 @@
 
 require build
 
-DEFINE_string "boxname" "dummy" "Vagrant box name"
-DEFINE_string "vagrantbox" "$shome/boxes/dummy.box" "Vagrant box path"
-DEFINE_string "bootstrap" "$shome/bootstrap/ubuntu.sh" "Initial bootstrap script" 
 DEFINE_string "ami" "" "AMI to use for bootstrap, defaults to latest Ubuntu cloud image"
+DEFINE_string 'region' 'us-east-1' 'AWS region'
+DEFINE_string 'disk' 'ebs' 'AWS disk type'
+DEFINE_string 'arch' 'amd64' 'AWS arch'
+DEFINE_string 'instype' 'm1.large' "AWS instance type"
 
 function pick_ami {
 	# This selects the most recent release Ubuntu cloud image
@@ -90,7 +91,6 @@ function image_status {
 function conf_vagrant {
   local release_dir="$1"; shift
   local pth_script="$1"; shift
-  local nm_box="dummy"
   local id_ami="$1"; shift
   local nm_keypair="$1"; shift
   local pth_private_key_path="$1"; shift
@@ -101,7 +101,7 @@ function conf_vagrant {
   { 
     "run_list": ["vagrant::aws"], 
     "vagrant": { 
-      "box": "$nm_box",
+      "box": "${FLAGS_boxname}",
       "provision": { "shell": { "path": "$pth_script" }},
       "release_dir": "$release_dir",
       "access_key_id": "$AWS_ACCESS_KEY",
@@ -185,6 +185,3 @@ function demo_in_vagrant {
 function forwarded_ssh_port {
   echo "22"
 }
-
-
-
