@@ -1,12 +1,14 @@
 #!/bin/bash
 
 # parse the command-line
-DEFINE_string 'region' 'us-east-1' 'AWS region' 'R'
-DEFINE_string 'disk' 'ebs' 'AWS disk type' 'B'
-DEFINE_string 'arch' 'amd64' 'AWS arch' 'a'
-DEFINE_string 'instype' 'm1.large' "AWS instance type" "T"
-DEFINE_string 'release' 'precise' 'Ubuntu release' 'U'
-DEFINE_string 'sshauth' "$HOME/.ssh/authorized_keys" 'Authorized ssh keys' 's'
+DEFINE_string 'region' 'us-east-1' 'AWS region'
+DEFINE_string 'disk' 'ebs' 'AWS disk type'
+DEFINE_string 'arch' 'amd64' 'AWS arch'
+DEFINE_string 'instype' 'm1.large' "AWS instance type"
+DEFINE_string 'release' 'precise' 'Ubuntu release'
+DEFINE_string 'sshauth' "$HOME/.ssh/authorized_keys" 'Authorized ssh keys'
+DFINE_boolean 'demo' "$FLAGS_FALSE" "Launch a demo instance and ssh in"
+DFINE_string 'sshopts' "" "ssh options during a demo"
 
 function until_port_open {
   local address="$1"; shift
@@ -35,7 +37,10 @@ function build_vagrant {
   bootstrap_ubuntu "$nm_keypair"
   early_termination
   local id_image="$(bundle_vagrant)"
-  demo_vagrant "$nm_keypair" "$id_image" "$@"
+
+  if [[ "$FLAGS_demo" = "$FLAGS_TRUE" ]]; then
+    demo_vagrant "$nm_keypair" "$id_image" "$@"
+  fi
 
   delete_keypair "$nm_keypair"
 }
