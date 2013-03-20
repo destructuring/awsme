@@ -2,9 +2,9 @@
 
 require build
 
-DEFINE_string "newname" "awsme" "New Vagrant box name"
 DEFINE_string "boxname" "precise-server-cloudimg-amd64" "Vagrant box name"
 DEFINE_string "vagrantbox" "$shome/boxes/precise-server-cloudimg-amd64-vagrant-disk1.box" "Vagrant box path"
+DEFINE_string "output" "" "Where to bundle the vagrant box"
 DEFINE_string "bootstrap" "$shome/bootstrap/ubuntu.sh" "Initial bootstrap script" 
 
 function vbox_state {
@@ -86,11 +86,18 @@ function build_specific {
 }
 
 function bundle_vagrant {
+  local nm_random="demo-$$-$RANDOM"
+  if [[ -z "$FLAGS_output" ]]; then
+    FLAGS_output="$shome/${nm_random}.box"
+  fi
   {
-    (cd $release_dir && bundle exec vagrant package --output ${FLAGS_newname}.box)
-    (cd $release_dir && bundle exec vagrant box remove ${FLAGS_newname} virtualbox || true)
-    (cd $release_dir && bundle exec vagrant box add ${FLAGS_newname} ${FLAGS_newname}.box)
+    (cd $release_dir && bundle exec vagrant package --output ${FLAGS_output})
     (cd $release_dir && bundle exec vagrant destroy -f)
+
+    if [[ "$FLAGS_demo" = "$FLAGS_TRUE" ]]l; then
+      FLAGS_tmpname="$nm_random"
+      bundle exec vagrant box add ${FLAGS_tmpname} ${FLAGS_output}
+    fi
   } 1>&2
 }
 
@@ -98,12 +105,13 @@ function demo_vagrant {
   local nm_keypair="$1"; shift
   local id_image="$1"; shift
 
-  conf_vagrant "$release_dir" "$shome/bootstrap/noop.sh" "${FLAGS_newname}"
+  conf_vagrant "$release_dir" "$shome/bootstrap/noop.sh" "${FLAGS_tmpname}"
   (cd $release_dir && bundle exec vagrant up --provider virtualbox)
   until_vagrant "running"
   until_port_open localhost "$(forwarded_ssh_port)"
   demo_in_vagrant "$@"
   (cd $release_dir && bundle exec vagrant destroy -f)
+  bundle exec vagrant box remove ${FLAGS_tmpname} virtualbox
 }
 
 function demo_in_vagrant {
