@@ -184,9 +184,7 @@ function bundle_vagrant {
     }
 ____EOF
     rm -f "$FLAGS_output"
-    set -x
     tar cvfz "$FLAGS_output" -C "$tmp_metadata" metadata.json
-    bash
     rm -rf "$tmp_metadata"
   } 1>&2
 
