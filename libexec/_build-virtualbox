@@ -115,7 +115,7 @@ function demo_vagrant {
   until_port_open localhost "$(forwarded_ssh_port)"
   demo_in_vagrant "$@"
   (cd $release_dir && bundle exec vagrant destroy -f)
-  bundle exec vagrant box remove "$(basename "${FLAGS_output}" .box)" virtualbox
+  bundle exec vagrant box remove "$id_image" virtualbox
 }
 
 function demo_in_vagrant {
