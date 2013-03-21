@@ -99,19 +99,23 @@ function conf_vagrant {
   local nm_keypair="$1"; shift
   local pth_private_key_path="$1"; shift
 
+  local str_ami=
+  if [[ -n "$id_ami" ]]; then
+    str_ami="\"ami\": \"$id_ami\","
+  fi
 
   local tmp_dna="$(mktemp -t XXXXXXXXX)"
   cat > "$tmp_dna" <<EOF
   { 
     "run_list": ["vagrant::aws"], 
     "vagrant": { 
+      $str_ami
       "box": "${FLAGS_boxname}",
       "provision": { "shell": { "path": "$pth_script" }},
       "release_dir": "$release_dir",
       "access_key_id": "$AWS_ACCESS_KEY",
       "secret_access_key": "$AWS_SECRET_KEY",
       "keypair_name": "$nm_keypair",
-      "ami": "$id_ami",
       "instance_type": "m1.large",
       "ssh_username": "ubuntu",
       "ssh_private_key_path": "$pth_private_key_path"
@@ -179,12 +183,18 @@ function bundle_vagrant {
     local tmp_metadata="$(mktemp -d -t XXXXXXXXX)"
     cat > "$tmp_metadata/metadata.json" << ____EOF
     {
-          "provider": "aws",
-          "ami": "$id_image"
+          "provider": "aws"
     }
 ____EOF
+    cat > "$tmp_metadata/Vagrantfile" << ____EOF
+    Vagrant.configure("2") do |config|
+      config.vm.provider :aws do |aws|
+        aws.ami = "$id_image"
+      end
+    end
+____EOF
     rm -f "$FLAGS_output"
-    tar cvfz "$FLAGS_output" -C "$tmp_metadata" metadata.json
+    tar cvfz "$FLAGS_output" -C "$tmp_metadata" metadata.json Vagrantfile
     rm -rf "$tmp_metadata"
   } 1>&2
 
