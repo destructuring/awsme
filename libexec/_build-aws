@@ -165,12 +165,27 @@ function build_specific {
 }
 
 function bundle_vagrant {
+  if [[ -z "$FLAGS_output" ]]; then
+    FLAGS_output="$shome/${nm_random}.box"
+  fi
+
   {
     local nm_ami=`date "+base_%Y-%m-%d-%H-%M"`
     local id_instance="$(cat $release_dir/.vagrant/machines/default/aws/id)"
     local id_image="$(ec2-create-image --region "$FLAGS_region" -K $EC2_PRIVATE_KEY -C $EC2_CERT -n $nm_ami $id_instance | awk '$1 == "IMAGE" {print $2}')"
     until_ami "$id_image" "available"
     (cd $release_dir && bundle exec vagrant destroy -f)
+
+    local tmp_metadata="$(mktemp -d -t XXXXXXXXX)"
+    cat > "$tmp_metadata/metadata.json" << ____EOF
+    {
+          "provider": "aws",
+          "ami": "$id_image"
+    }
+____EOF
+    rm -f "$FLAGS_output"
+    tar cvfz "$FLAGS_output" metadata.json "$tmp_metadata"
+    rm -rf "$tmp_metadata"
   } 1>&2
 
   echo "$id_image"
