@@ -15,7 +15,8 @@ function build_vagrant {
   mkdir -p $release_dir
 
   local nm_keypair="$(build_keypair)"
-  
   local id_image="$(clean_id_image)"
   demo_vagrant "$nm_keypair" "$id_image" "$@"
+  delete_keypair "$nm_keypair"
+  rm -rf "$release_dir"
 }

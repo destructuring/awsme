@@ -204,6 +204,7 @@ ____EOF
 function demo_vagrant {
   local nm_keypair="$1"; shift
   local id_image="$1"; shift
+
   conf_vagrant "$release_dir" "$shome/bootstrap/noop.sh" "$id_image" "$nm_keypair" "$release_dir/.id_rsa"
   (cd $release_dir && bundle exec vagrant up --provider aws)
   demo_in_vagrant "$@"

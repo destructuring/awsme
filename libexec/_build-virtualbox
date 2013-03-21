@@ -98,7 +98,7 @@ function bundle_vagrant {
     (cd $release_dir && bundle exec vagrant destroy -f)
 
     if [[ "$FLAGS_demo" = "$FLAGS_TRUE" ]]; then
-      bundle exec vagrant box add "$(basename "${FLAGS_output}" .box)" "${FLAGS_output}"
+      bundle exec vagrant box add "$nm_random" "${FLAGS_output}"
     fi
   } 1>&2
 
@@ -109,7 +109,7 @@ function demo_vagrant {
   local nm_keypair="$1"; shift
   local id_image="$1"; shift
 
-  conf_vagrant "$release_dir" "$shome/bootstrap/noop.sh" "$(basename "${FLAGS_output}" .box)"
+  conf_vagrant "$release_dir" "$shome/bootstrap/noop.sh" "$id_image"
   (cd $release_dir && bundle exec vagrant up --provider virtualbox)
   until_vagrant "running"
   until_port_open localhost "$(forwarded_ssh_port)"
