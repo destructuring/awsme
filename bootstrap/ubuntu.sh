@@ -41,9 +41,8 @@ function main {
   update-ca-certificates --fresh
 
   # github.com, bitbucket.org
-  mkdir -p .ssh
-  ssh-keyscan github.com >> .ssh/known_hosts
-  ssh-keyscan bitbucket.org >> .ssh/known_hosts
+  ssh-keyscan github.com >> /etc/ssh/ssh_known_hosts
+  ssh-keyscan bitbucket.org >> /etc/ssh/ssh_known_hosts
 
   ### START finished.sh
   aptitude clean

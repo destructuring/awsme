@@ -115,7 +115,11 @@ function demo_vagrant {
   until_port_open localhost "$(forwarded_ssh_port)"
   demo_in_vagrant "$@"
   (cd $release_dir && bundle exec vagrant destroy -f)
-  bundle exec vagrant box remove "$id_image" virtualbox
+  if [[ "$id_image" =~ ^demo-\d+-\d+$ ]]; then
+    true
+  else
+    bundle exec vagrant box remove "$id_image" virtualbox
+  fi
 }
 
 function demo_in_vagrant {
