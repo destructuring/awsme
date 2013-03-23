@@ -41,7 +41,7 @@ function main {
   update-ca-certificates --fresh
 
   # github.com, bitbucket.org
-  mkdir .ssh
+  mkdir -p .ssh
   ssh-keyscan github.com >> .ssh/known_hosts
   ssh-keyscan bitbucket.org >> .ssh/known_hosts
 
