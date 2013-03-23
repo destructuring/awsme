@@ -1,6 +1,8 @@
 #!/bin/bash -exfu
 
 function main {
+  cd
+
   export DEBIAN_FRONTEND="noninteractive"
 
   # update everything
@@ -37,6 +39,11 @@ function main {
 
   # ssl updates
   update-ca-certificates --fresh
+
+  # github.com, bitbucket.org
+  mkdir .ssh
+  ssh-keyscan github.com >> .ssh/known_hosts
+  ssh-keyscan bitbucket.org >> .ssh/known_hosts
 
   ### START finished.sh
   aptitude clean
