@@ -116,8 +116,6 @@ function demo_vagrant {
   demo_in_vagrant "$@"
   (cd $release_dir && bundle exec vagrant destroy -f)
   if [[ "$id_image" =~ ^demo-\d+-\d+$ ]]; then
-    true
-  else
     bundle exec vagrant box remove "$id_image" virtualbox
   fi
 }
