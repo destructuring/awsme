@@ -16,6 +16,9 @@ function main {
   # basic packages
   aptitude -y install wget curl netcat git rsync make
 
+  # language
+  aptitude -y install language-pack-en
+
   # unecessary daemons
   aptitude -y purge whoopsie acpid nfs-common rpcbind
 
