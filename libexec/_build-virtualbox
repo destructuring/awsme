@@ -86,23 +86,9 @@ function build_specific {
 }
 
 function bundle_vagrant {
-  local nm_random="demo-$$-$RANDOM"
-
-  if [[ -z "$FLAGS_output" ]]; then
-    FLAGS_output="$shome/${nm_random}.box"
-  fi
-
-  {
-    rm -f "$FLAGS_output"
-    (cd $release_dir && bundle exec vagrant package --output ${FLAGS_output})
-    (cd $release_dir && bundle exec vagrant destroy -f)
-
-    if [[ "$FLAGS_demo" = "$FLAGS_TRUE" ]]; then
-      bundle exec vagrant box add "$nm_random" "${FLAGS_output}"
-    fi
-  } 1>&2
-
-  echo "$nm_random"
+  rm -f "$FLAGS_output"
+  (cd $release_dir && bundle exec vagrant package --output ${FLAGS_output})
+  (cd $release_dir && bundle exec vagrant destroy -f)
 }
 
 function demo_vagrant {
@@ -114,10 +100,6 @@ function demo_vagrant {
   until_vagrant "running"
   until_port_open localhost "$(forwarded_ssh_port)"
   demo_in_vagrant "$@"
-  (cd $release_dir && bundle exec vagrant destroy -f)
-  if [[ "$id_image" =~ ^demo-\d+-\d+$ ]]; then
-    bundle exec vagrant box remove "$id_image" virtualbox
-  fi
 }
 
 function demo_in_vagrant {

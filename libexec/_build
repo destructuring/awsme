@@ -4,7 +4,6 @@
 DEFINE_string "boxname" "" "Vagrant box name"
 DEFINE_string "bootstrap" "$shome/bootstrap/ubuntu.sh" "Initial bootstrap script"
 DEFINE_string 'release' 'precise' 'Ubuntu release'
-DEFINE_boolean 'demo' "$FLAGS_FALSE" "Launch a demo instance and ssh in"
 DEFINE_string 'sshopts' "" "ssh options during a demo"
 DEFINE_string "output" "" "Where to bundle the vagrant box"
 
@@ -33,12 +32,7 @@ function build_vagrant {
   
   bootstrap_ubuntu "$nm_keypair"
   early_termination
-  local id_image="$(bundle_vagrant)"
-
-  if [[ "$FLAGS_demo" = "$FLAGS_TRUE" ]]; then
-    demo_vagrant "$nm_keypair" "$id_image" "$@"
-  fi
-
+  bundle_vagrant
   delete_keypair "$nm_keypair"
   rm -rf "$release_dir"
 }

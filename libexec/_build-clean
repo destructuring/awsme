@@ -16,7 +16,10 @@ function build_vagrant {
 
   local nm_keypair="$(build_keypair)"
   local id_image="$(clean_id_image)"
+  #bootstrap_ubuntu "$nm_keypair"
+  early_termination
   demo_vagrant "$nm_keypair" "$id_image" "$@"
+  bundle_vagrant
   delete_keypair "$nm_keypair"
   rm -rf "$release_dir"
 }
