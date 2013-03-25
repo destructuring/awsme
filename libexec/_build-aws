@@ -170,7 +170,7 @@ function build_specific {
 
 function bundle_vagrant {
   if [[ -z "$FLAGS_output" ]]; then
-    FLAGS_output="$shome/${nm_random}.box"
+    return 0
   fi
 
   local nm_ami=`date "+base_%Y-%m-%d-%H-%M"`

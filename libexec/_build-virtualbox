@@ -86,6 +86,10 @@ function build_specific {
 }
 
 function bundle_vagrant {
+  if [[ -z "$FLAGS_output" ]]; then
+    return 0
+  fi
+
   rm -f "$FLAGS_output"
   (cd $release_dir && bundle exec vagrant package --output ${FLAGS_output})
   (cd $release_dir && bundle exec vagrant destroy -f)
