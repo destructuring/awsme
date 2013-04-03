@@ -35,7 +35,6 @@ function forwarded_ssh_port {
 }
 
 function conf_vagrant {
-  local FLAGS_release_dir="$1"; shift
   local pth_script="$1"; shift
   local nm_box="$1"; shift
 
@@ -48,7 +47,7 @@ function conf_vagrant {
     "vagrant": { 
       "box": "$nm_box",
       "provision": { "shell": { "path": "$pth_script", "args": "$ver_vbox" }},
-      "FLAGS_release_dir": "$FLAGS_release_dir"
+      "release_dir": "$FLAGS_release_dir"
     }
   }
 EOF
@@ -69,7 +68,7 @@ function delete_keypair {
 }
 
 function bootstrap_ubuntu {
-  conf_vagrant "$FLAGS_release_dir" "$FLAGS_bootstrap" "$FLAGS_boxname"
+  conf_vagrant "$FLAGS_bootstrap" "$FLAGS_boxname"
   (cd $FLAGS_release_dir && bundle exec vagrant up --provider virtualbox)
   until_vagrant "poweroff"
 }
@@ -80,7 +79,7 @@ function early_termination {
 
 function build_specific {
   # run virtualbox specific guest addition installer
-  conf_vagrant "$FLAGS_release_dir" "$shome/bootstrap/virtualbox.sh" "$FLAGS_boxname"
+  conf_vagrant "$shome/bootstrap/virtualbox.sh" "$FLAGS_boxname"
   (cd $FLAGS_release_dir && bundle exec vagrant up --provider virtualbox)
   until_vagrant "poweroff"
 }
@@ -99,7 +98,7 @@ function demo_vagrant {
   local nm_keypair="$1"; shift
   local id_image="$1"; shift
 
-  conf_vagrant "$FLAGS_release_dir" "$shome/bootstrap/noop.sh" "$id_image"
+  conf_vagrant "$shome/bootstrap/noop.sh" "$id_image"
   (cd $FLAGS_release_dir && bundle exec vagrant up --provider virtualbox)
   until_vagrant "running"
   until_port_open localhost "$(forwarded_ssh_port)"
