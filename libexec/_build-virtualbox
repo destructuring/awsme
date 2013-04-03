@@ -69,7 +69,7 @@ function delete_keypair {
 
 function bootstrap_ubuntu {
   conf_vagrant "$FLAGS_bootstrap" "$FLAGS_boxname"
-  (cd $FLAGS_release_dir && bundle exec vagrant up --provider virtualbox)
+  (cd $FLAGS_release_dir && BUNDLE_GEMFILE="$shome/Gemfile" bundle exec vagrant up --provider virtualbox)
   until_vagrant "poweroff"
 }
 
@@ -80,7 +80,7 @@ function early_termination {
 function build_specific {
   # run virtualbox specific guest addition installer
   conf_vagrant "$shome/bootstrap/virtualbox.sh" "$FLAGS_boxname"
-  (cd $FLAGS_release_dir && bundle exec vagrant up --provider virtualbox)
+  (cd $FLAGS_release_dir && BUNDLE_GEMFILE="$shome/Gemfile" bundle exec vagrant up --provider virtualbox)
   until_vagrant "poweroff"
 }
 
@@ -90,8 +90,8 @@ function bundle_vagrant {
   fi
 
   rm -f "$FLAGS_output"
-  (cd $FLAGS_release_dir && bundle exec vagrant package --output ${FLAGS_output})
-  (cd $FLAGS_release_dir && bundle exec vagrant destroy -f)
+  (cd $FLAGS_release_dir && BUNDLE_GEMFILE="$shome/Gemfile" bundle exec vagrant package --output ${FLAGS_output})
+  (cd $FLAGS_release_dir && BUNDLE_GEMFILE="$shome/Gemfile" bundle exec vagrant destroy -f)
 }
 
 function demo_vagrant {
@@ -99,12 +99,12 @@ function demo_vagrant {
   local id_image="$1"; shift
 
   conf_vagrant "$shome/bootstrap/noop.sh" "$id_image"
-  (cd $FLAGS_release_dir && bundle exec vagrant up --provider virtualbox)
+  (cd $FLAGS_release_dir && BUNDLE_GEMFILE="$shome/Gemfile" bundle exec vagrant up --provider virtualbox)
   until_vagrant "running"
   until_port_open localhost "$(forwarded_ssh_port)"
   demo_in_vagrant "$@"
 }
 
 function demo_in_vagrant {
-  (cd $FLAGS_release_dir && bundle exec vagrant ssh)
+  (cd $FLAGS_release_dir && BUNDLE_GEMFILE="$shome/Gemfile" bundle exec vagrant ssh)
 }
