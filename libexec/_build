@@ -6,6 +6,7 @@ DEFINE_string "bootstrap" "$shome/bootstrap/ubuntu.sh" "Initial bootstrap script
 DEFINE_string 'release' 'precise' 'Ubuntu release'
 DEFINE_string 'sshopts' "" "ssh options during a demo"
 DEFINE_string "output" "" "Where to bundle the vagrant box"
+DEFINE_string "release_dir" "$shome/vagrant-$(date +%Y%m%d-%H%M-$$)" "Vagrant instance workarea"
 
 function until_port_open {
   local address="$1"; shift
@@ -24,9 +25,7 @@ function until_port_open {
 }
 
 function build_vagrant {
-  local release_dir="$shome/vagrant-$(build_type)-$(date +%Y%m%d-%H%M-$$)"
-
-  mkdir -p $release_dir
+  mkdir -p $FLAGS_release_dir
 
   local nm_keypair="$(build_keypair)"
   
@@ -34,5 +33,5 @@ function build_vagrant {
   early_termination
   bundle_vagrant
   delete_keypair "$nm_keypair"
-  rm -rf "$release_dir"
+  rm -rf "$FLAGS_release_dir"
 }

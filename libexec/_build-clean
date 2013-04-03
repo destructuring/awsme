@@ -4,15 +4,13 @@ function demo_in_vagrant {
   local pth_custom="${@:$(($#))}"
 
   local tmp_ssh_config="$(mktemp -t XXXXXXXXX)"
-  (cd $release_dir && bundle exec vagrant ssh-config > "$tmp_ssh_config")
+  (cd $FLAGS_release_dir && bundle exec vagrant ssh-config > "$tmp_ssh_config")
   $pth_custom "$tmp_ssh_config" "${@:1:$(($#-1))}"
   rm -f "$tmp_ssh_config"
 }
 
 function build_vagrant {
-  local release_dir="$shome/vagrant-$(build_type)-$(date +%Y%m%d-%H%M-$$)"
-
-  mkdir -p $release_dir
+  mkdir -p $FLAGS_release_dir
 
   local nm_keypair="$(build_keypair)"
   #bootstrap_ubuntu "$nm_keypair"
@@ -20,5 +18,5 @@ function build_vagrant {
   early_termination
   bundle_vagrant
   delete_keypair "$nm_keypair"
-  rm -rf "$release_dir"
+  rm -rf "$FLAGS_release_dir"
 }
