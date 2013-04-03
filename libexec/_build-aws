@@ -201,7 +201,7 @@ function demo_vagrant {
 }
 
 function demo_in_vagrant {
-  (cd $FLAGS_release_dir && bundle exec vagrant ssh -- "$FLAGS_sshopts")
+(cd $FLAGS_release_dir && bundle exec vagrant ssh)
 }
 
 function forwarded_ssh_port {
