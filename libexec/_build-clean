@@ -15,9 +15,8 @@ function build_vagrant {
   mkdir -p $release_dir
 
   local nm_keypair="$(build_keypair)"
-  local id_image="$(clean_id_image)"
   #bootstrap_ubuntu "$nm_keypair"
-  demo_vagrant "$nm_keypair" "$id_image" "$@"
+  demo_vagrant "$nm_keypair" "$FLAGS_boxname" "$@"
   early_termination
   bundle_vagrant
   delete_keypair "$nm_keypair"

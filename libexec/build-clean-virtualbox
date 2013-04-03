@@ -24,8 +24,4 @@ function main {
   time build_vagrant "$@"
 }
 
-function clean_id_image {
-  echo "$FLAGS_boxname"
-}
-
 require sub "$BASH_SOURCE" "$@"

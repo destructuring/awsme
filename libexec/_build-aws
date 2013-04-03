@@ -95,22 +95,16 @@ function image_status {
 function conf_vagrant {
   local release_dir="$1"; shift
   local pth_script="$1"; shift
-  local id_ami="$1"; shift
+  local nm_box="$1"; shift
   local nm_keypair="$1"; shift
   local pth_private_key_path="$1"; shift
-
-  local str_ami=
-  if [[ -n "$id_ami" ]]; then
-    str_ami="\"ami\": \"$id_ami\","
-  fi
 
   local tmp_dna="$(mktemp -t XXXXXXXXX)"
   cat > "$tmp_dna" <<EOF
   { 
     "run_list": ["vagrant::aws"], 
     "vagrant": { 
-      $str_ami
-      "box": "${FLAGS_boxname}",
+      "box": "${nm_box}",
       "provision": { "shell": { "path": "$pth_script" }},
       "release_dir": "$release_dir",
       "access_key_id": "$AWS_ACCESS_KEY",
@@ -199,9 +193,9 @@ __EOF
 
 function demo_vagrant {
   local nm_keypair="$1"; shift
-  local id_image="$1"; shift
+  local nm_box="$1"; shift
 
-  conf_vagrant "$release_dir" "$shome/bootstrap/noop.sh" "$id_image" "$nm_keypair" "$release_dir/.id_rsa"
+  conf_vagrant "$release_dir" "$shome/bootstrap/noop.sh" "$nm_box" "$nm_keypair" "$release_dir/.id_rsa"
   (cd $release_dir && bundle exec vagrant up --provider aws)
   demo_in_vagrant "$@"
 }
