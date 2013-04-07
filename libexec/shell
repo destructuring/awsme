@@ -30,12 +30,20 @@ function main {
   if [[ "$FLAGS_clean" = "$FLAGS_TRUE" ]]; then
     unset PROMPT_COMMAND
     if [[ -n "$FLAGS_rcfile" ]]; then
-      $FLAGS_shell --noprofile --rcfile "$FLAGS_rcfile"
+      if [[ "$#" > 0 ]]; then
+        exec $FLAGS_shell --noprofile --rcfile "$FLAGS_rcfile" -c "$*"
+      else
+        exec $FLAGS_shell --noprofile --rcfile "$FLAGS_rcfile"
+      fi
     else
-      $FLAGS_shell --noprofile
+      exec $FLAGS_shell --noprofile
     fi
   else
-    exec $FLAGS_shell
+    if [[ "$#" > 0 ]]; then
+      exec $FLAGS_shell -c "$*"
+    else
+      exec $FLAGS_shell
+    fi
   fi
 }
 
