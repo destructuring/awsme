@@ -93,7 +93,6 @@ function image_status {
 }
 
 function conf_vagrant {
-  local pth_script="$1"; shift
   local nm_box="$1"; shift
   local nm_keypair="$1"; shift
   local pth_private_key_path="$1"; shift
@@ -104,7 +103,6 @@ function conf_vagrant {
     "run_list": ["vagrant::aws"], 
     "vagrant": { 
       "box": "${nm_box}",
-      "provision": { "shell": { "path": "$pth_script" }},
       "release_dir": "$FLAGS_release_dir",
       "access_key_id": "$AWS_ACCESS_KEY",
       "secret_access_key": "$AWS_SECRET_KEY",
@@ -141,7 +139,7 @@ function delete_keypair {
 function bootstrap_ubuntu {
   local nm_keypair="$1"; shift
 
-  conf_vagrant "$FLAGS_bootstrap" "${FLAGS_ami:-$(pick_ami)}" "$nm_keypair" "$FLAGS_release_dir/.id_rsa"
+  conf_vagrant "${FLAGS_ami:-$(pick_ami)}" "$nm_keypair" "$FLAGS_release_dir/.id_rsa"
   (cd $FLAGS_release_dir && BUNDLE_GEMFILE="$shome/Gemfile" bundle exec vagrant up --provider aws)
   until_vagrant "stopped" "terminated" "null"
 } 
@@ -156,10 +154,6 @@ function early_termination {
     return 1
   fi
 } 
-
-function build_specific {
-  true
-}
 
 function bundle_vagrant {
   if [[ -z "$FLAGS_output" ]]; then
@@ -194,7 +188,7 @@ function demo_vagrant {
   local nm_keypair="$1"; shift
   local nm_box="$1"; shift
 
-  conf_vagrant "$shome/bootstrap/noop.sh" "$nm_box" "$nm_keypair" "$FLAGS_release_dir/.id_rsa"
+  conf_vagrant "$nm_box" "$nm_keypair" "$FLAGS_release_dir/.id_rsa"
   (cd $FLAGS_release_dir && BUNDLE_GEMFILE="$shome/Gemfile" bundle exec vagrant up --provider aws)
   demo_in_vagrant "$@"
 }
