@@ -124,6 +124,7 @@ function build_type {
 function build_keypair {
   local nm_keypair="tmp-build-ami-keypair-${USER:-${LOGNAME:-}}-$(date +%s)-$$"
   {
+    rm -f "$FLAGS_release_dir/.id_rsa"
     ssh-keygen -N "" -f "$FLAGS_release_dir/.id_rsa"
     ec2-import-keypair --region $FLAGS_region --public-key-file "$FLAGS_release_dir/.id_rsa.pub" $nm_keypair
   } 1>&2
