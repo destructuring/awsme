@@ -28,7 +28,7 @@ if [[ -z "$JAVA_HOME" ]]; then
   exit 1
 fi
 
-: ${AWS_CREDENTIAL_FILE:="$AWSME/config/aws.txt"}
+AWS_CREDENTIAL_FILE="$AWSME/config/aws.txt"
 export AWS_CREDENTIAL_FILE
 
 if [[ -z "$AWS_CREDENTIAL_FILE" ]]; then
@@ -36,7 +36,7 @@ if [[ -z "$AWS_CREDENTIAL_FILE" ]]; then
   exit 1
 fi
 
-: ${AWS_SECRET_KEY:="$(ryaml $AWSME/config/aws.yml AWS_SECRET_KEY)"}
+AWS_SECRET_KEY="$(ryaml $AWSME/config/aws.yml AWS_SECRET_KEY)"
 export AWS_SECRET_KEY
 
 if [[ -z "$AWS_SECRET_KEY" ]]; then
@@ -44,7 +44,7 @@ if [[ -z "$AWS_SECRET_KEY" ]]; then
   exit 1
 fi
 
-: ${AWS_ACCESS_KEY:="$(ryaml $AWSME/config/aws.yml AWS_ACCESS_KEY)"}
+AWS_ACCESS_KEY="$(ryaml $AWSME/config/aws.yml AWS_ACCESS_KEY)"
 export AWS_ACCESS_KEY
 
 if [[ -z "$AWS_ACCESS_KEY" ]]; then
@@ -52,7 +52,7 @@ if [[ -z "$AWS_ACCESS_KEY" ]]; then
   exit 1
 fi
 
-: ${EC2_PRIVATE_KEY:="$AWSME/config/private-key.pem"}
+EC2_PRIVATE_KEY="$AWSME/config/private-key.pem"
 export EC2_PRIVATE_KEY
 
 if [[ -z "EC2_PRIVATE_KEY" ]]; then
@@ -60,7 +60,7 @@ if [[ -z "EC2_PRIVATE_KEY" ]]; then
   exit 1
 fi
 
-: ${EC2_CERT:="$AWSME/config/certificate.pem"}
+EC2_CERT="$AWSME/config/certificate.pem"
 export EC2_CERT
 
 if [[ -z "EC2_CERT" ]]; then
