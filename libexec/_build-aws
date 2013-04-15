@@ -141,7 +141,9 @@ function bootstrap_ubuntu {
   local nm_keypair="$1"; shift
 
   conf_vagrant "${FLAGS_ami:-$(pick_ami)}" "$nm_keypair" "$FLAGS_release_dir/.id_rsa"
-  (cd $FLAGS_release_dir && BUNDLE_GEMFILE="$shome/Gemfile" bundle exec vagrant up --provider aws)
+  pushd $FLAGS_release_dir
+  BUNDLE_GEMFILE="$shome/Gemfile" bundle exec vagrant up --provider aws
+  popd
   until_vagrant "stopped" "terminated" "null"
 } 
 

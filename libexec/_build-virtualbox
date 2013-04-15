@@ -67,7 +67,9 @@ function delete_keypair {
 
 function bootstrap_ubuntu {
   conf_vagrant "$FLAGS_boxname"
-  (cd $FLAGS_release_dir && BUNDLE_GEMFILE="$shome/Gemfile" bundle exec vagrant up --provider virtualbox)
+  pushd $FLAGS_release_dir
+  BUNDLE_GEMFILE="$shome/Gemfile" bundle exec vagrant up --provider virtualbox
+  popd
   until_vagrant "poweroff"
 }
 
