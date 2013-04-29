@@ -171,7 +171,7 @@ function bundle_vagrant {
   local nm_ami=`date "+$(basename $FLAGS_output .box | perl -pe 's{:(\w+)}{\($1\)}g')_%Y-%m-%d-%H-%M"`
   local id_instance="$(cat $FLAGS_release_dir/.vagrant/machines/default/aws/id)"
 
-  log_info "creating image $nm_ami from instance $id_instance"
+  logger_info "creating image $nm_ami from instance $id_instance"
 
   local id_image="$(ec2-create-image --region "$FLAGS_region" -K $EC2_PRIVATE_KEY -C $EC2_CERT -n $nm_ami $id_instance | awk '$1 == "IMAGE" {print $2}')"
   if [[ -z "$id_image" ]]; then
