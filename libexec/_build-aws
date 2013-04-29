@@ -163,7 +163,7 @@ function bundle_vagrant {
     return 0
   fi
 
-  local nm_ami=`date "+base_%Y-%m-%d-%H-%M"`
+  local nm_ami=`date "+$(basename $FLAGS_output .box)_%Y-%m-%d-%H-%M"`
   local id_instance="$(cat $FLAGS_release_dir/.vagrant/machines/default/aws/id)"
   local id_image="$(ec2-create-image --region "$FLAGS_region" -K $EC2_PRIVATE_KEY -C $EC2_CERT -n $nm_ami $id_instance | awk '$1 == "IMAGE" {print $2}')"
   until_ami "$id_image" "available"
