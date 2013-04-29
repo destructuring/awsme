@@ -22,12 +22,20 @@ function until_port_open {
   done
 }
 
+function demo_in_vagrant {
+  local pth_custom="${@:$(($#))}"
+
+  local tmp_ssh_config="$(mktemp -t XXXXXXXXX)"
+  (cd $FLAGS_release_dir && BUNDLE_GEMFILE="$shome/Gemfile" bundle exec vagrant ssh-config | sed -n '/^Host/,$p' > "$tmp_ssh_config")
+  $pth_custom "$tmp_ssh_config" "${@:1:$(($#-1))}"
+  rm -f "$tmp_ssh_config"
+}
+
 function build_vagrant {
   mkdir -p $FLAGS_release_dir
 
   local nm_keypair="$(build_keypair)"
-  
-  bootstrap_ubuntu "$nm_keypair"
+  demo_vagrant "$nm_keypair" "$FLAGS_boxname" "$@"
   early_termination
   bundle_vagrant
   delete_keypair "$nm_keypair"

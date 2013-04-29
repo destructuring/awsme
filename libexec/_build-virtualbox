@@ -65,14 +65,6 @@ function delete_keypair {
   true
 }
 
-function bootstrap_ubuntu {
-  conf_vagrant "$FLAGS_boxname"
-  pushd $FLAGS_release_dir
-  BUNDLE_GEMFILE="$shome/Gemfile" bundle exec vagrant up --provider virtualbox
-  popd
-  until_vagrant "poweroff"
-}
-
 function early_termination {
   true
 }
@@ -96,8 +88,4 @@ function demo_vagrant {
   until_vagrant "running"
   until_port_open localhost "$(forwarded_ssh_port)"
   demo_in_vagrant "$@"
-}
-
-function demo_in_vagrant {
-  (cd $FLAGS_release_dir && BUNDLE_GEMFILE="$shome/Gemfile" bundle exec vagrant ssh)
 }

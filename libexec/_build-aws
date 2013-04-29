@@ -137,16 +137,6 @@ function delete_keypair {
   ec2-delete-keypair --region $FLAGS_region $nm_keypair
 }
 
-function bootstrap_ubuntu {
-  local nm_keypair="$1"; shift
-
-  conf_vagrant "${FLAGS_ami:-$(pick_ami)}" "$nm_keypair" "$FLAGS_release_dir/.id_rsa"
-  pushd $FLAGS_release_dir
-  BUNDLE_GEMFILE="$shome/Gemfile" bundle exec vagrant up --provider aws
-  popd
-  until_vagrant "stopped" "terminated" "null"
-} 
-
 function early_termination {
   local status="$(instance_status)"
   if [[ "$status" = "terminated" ]]; then
@@ -198,10 +188,6 @@ function demo_vagrant {
   conf_vagrant "$nm_box" "$nm_keypair" "$FLAGS_release_dir/.id_rsa"
   (cd $FLAGS_release_dir && BUNDLE_GEMFILE="$shome/Gemfile" bundle exec vagrant up --provider aws)
   demo_in_vagrant "$@"
-}
-
-function demo_in_vagrant {
-(cd $FLAGS_release_dir && BUNDLE_GEMFILE="$shome/Gemfile" bundle exec vagrant ssh)
 }
 
 function forwarded_ssh_port {
