@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 
-all: ready pyaws
+all: ready
 
 ready:
 	@git submodule update --init --recursive
