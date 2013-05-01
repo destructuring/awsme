@@ -13,6 +13,6 @@ gem "aws-sdk"
 
 gem "tvd-vagrant"
 
-gem "vagrant", "~> 1.2.0"
-gem "vagrant-aws", "~> 0.2.1"
+gem "tnargav", "~> 1.2.0"
+gem "tnargav-aws", "~> 0.2.1"
 gem "vagrant-shell"
