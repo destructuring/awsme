@@ -136,7 +136,7 @@ GEM
     tvd-vagrant (0.0.14)
       tvd-tvdinner
     uuidtools (2.1.3)
-    vagrant-shell (0.2.2)
+    vagrant-shell (0.2.3)
     yajl-ruby (1.1.0)
 
 PLATFORMS
@@ -147,8 +147,8 @@ DEPENDENCIES
   chefspec
   foodcritic
   minitest-chef-handler
-  tnargav (~> 1.2.0)
-  tnargav-aws (~> 0.2.1)
+  tnargav (~> 1.2.2)
+  tnargav-aws (~> 0.2.2)
   tvd-awsme!
   tvd-tvdinner
   tvd-vagrant
