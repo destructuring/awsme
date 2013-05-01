@@ -13,7 +13,6 @@ gem "aws-sdk"
 
 gem "tvd-vagrant"
 
-group :virtualbox do
-  gem "vagrant", "~> 1.2.0"
-  gem "vagrant-aws", "~> 0.2.1"
-end
+gem "vagrant", "~> 1.2.0"
+gem "vagrant-aws", "~> 0.2.1"
+gem "vagrant-shell"

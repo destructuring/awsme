@@ -136,6 +136,7 @@ GEM
       net-ssh (~> 2.6.6)
     vagrant-aws (0.2.1)
       fog (~> 1.10.0)
+    vagrant-shell (0.2.2)
     yajl-ruby (1.1.0)
 
 PLATFORMS
@@ -151,3 +152,4 @@ DEPENDENCIES
   tvd-vagrant
   vagrant (~> 1.2.0)
   vagrant-aws (~> 0.2.1)
+  vagrant-shell
