@@ -103,7 +103,7 @@ __EOF
   cat > "$tmp_metadata/Vagrantfile" << __EOF
   Vagrant.configure("2") do |config|
     config.vm.provider :shell do |shell|
-      shell.image $id_image"
+      shell.image "$id_image"
       override.vm.synced_folder ".", "/vagrant", :id => "vagrant-root", :disabled => true
     end
   end
