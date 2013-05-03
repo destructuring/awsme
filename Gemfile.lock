@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    tvd-awsme (0.0.4)
+    tvd-awsme (0.1.0)
       tvd-tvdinner
 
 GEM
