@@ -19,7 +19,7 @@ require build
 
 DEFINE_string "image" "ubuntu" "Image to use for bootstrap, defaults to public ubuntu image"
 DEFINE_string "script" "$(BUNDLE_GEMFILE=$shome/Gemfile bundle show vagrant-shell)/libexec/shell-docker" "Shell script for vagrant-shell"
-DEFINE_string "run_args" "bash -c 'mkdir -p /var/run/sshd; exec /usr/sbin/sshd -D'" "Run arguments for vagrant-shell run-instance"
+DEFINE_string "run_args" "/usr/sbin/sshd -D" "Run arguments for vagrant-shell run-instance"
 
 function until_vagrant {
   logger_info "waiting for $@"
