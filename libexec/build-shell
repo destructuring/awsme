@@ -60,8 +60,8 @@ function conf_vagrant {
       "box": "${nm_box}",
       "release_dir": "$FLAGS_release_dir",
       "ssh_username": "root",
-      "script_script": "${OVERRIDE_script:-${FLAGS_script}}",
-      "script_args": "${OVERRIDE_run_args:-${FLAGS_run_args}}"
+      "shell_script": "${OVERRIDE_script:-${FLAGS_script}}",
+      "shell_args": "${OVERRIDE_run_args:-${FLAGS_run_args}}"
     }
   }
 EOF
