@@ -87,12 +87,14 @@ function bundle_vagrant {
     return 0
   fi
 
-  local nm_image=`date "+$(basename $FLAGS_output .box | perl -pe 's{:(\w+)}{\($1\)}g')_%Y-%m-%d-%H-%M"`
+  local base_image="$(basename $FLAGS_output .box | perl -pe 's{:(\w+)}{\($1\)}g')"
+  local tag_image="$(date "+%Y-%m-%d-%H-%M")"
+  local nm_image="${base_image}_${tag_image}"
   local id_instance="$(cat $FLAGS_release_dir/.vagrant/machines/default/shell/id)"
 
   logger_info "creating image $nm_image from instance $id_instance"
 
-  local id_image="$(docker commit $id_instance $nm_image)"
+  local id_image="$(docker commit $id_instance $base_image $tag_image)"
   if [[ -z "$id_image" ]]; then
     logger_fatal "could not retrieve image id"
     return 1
