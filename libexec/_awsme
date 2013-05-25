@@ -16,6 +16,7 @@ export AWS_AUTO_SCALING_HOME="$AWSME/vendor/projects/as"
 export AWS_IAM_HOME="$AWSME/vendor/projects/iam"
 export AWS_ELB_HOME="$AWSME/vendor/projects/elb"
 export AWS_ELASTICACHE_HOME="$AWSME/vendor/projects/elasticache"
+export AWS_CLOUDWATCH_HOME="$AWSME/vendor/projects/mon"
 
 : ${JAVA_HOME:="$(/usr/libexec/java_home 2>&-)"}
 export JAVA_HOME
