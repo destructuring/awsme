@@ -1,11 +1,11 @@
 /.bundle/
 /vendor/bundle/
 /*.gem
+*.orig
+/tmp
 /crash.log
 /output
 /git
-*.orig
-/tmp
 /libexec/virtualenv.pyc
 /.awscli
 /install
