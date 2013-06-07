@@ -15,6 +15,7 @@ $(AWSME_CLI)/.gitignore:
 awscli: \
 	$(AWSME_CLI)/AWSCloudFormation-cli.zip $(AWSME_CLI)/AWSCloudFormation-cli.zip $(AWSME_CLI)/AutoScaling-2011-01-01.zip \
 	$(AWSME_CLI)/CloudWatch-2010-08-01.zip $(AWSME_CLI)/ElasticLoadBalancing.zip $(AWSME_CLI)/IAMCli.zip \
+	$(AWSME_CLI)/AmazonElastiCacheCli-latest.zip \
 	$(AWSME_CLI)/ec2/bin/ec2-version $(AWSME_CLI)/ec2/bin/ec2-ami-tools-version
 
 $(AWSME_CLI)/AWSCloudFormation-cli.zip: $(AWSME_CLI)/.gitignore
