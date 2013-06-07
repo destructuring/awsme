@@ -12,14 +12,6 @@ $(AWSME_CLI)/.gitignore:
 	@mkdir -p $(AWSME_CLI)
 	@touch $(AWSME_CLI)/.gitignore
 
-pyaws: .awscli/bin/aws
-	
-.awscli/bin/aws: .awscli/bin/python
-	set +u; source .awscli/bin/activate; pip install --index-url=file://`pwd`/vendor/cache/pip/simple awscli
-
-.awscli/bin/python:
-	python libexec/virtualenv.py --extra-search-dir=vendor --never-download .awscli
-
 awscli: \
 	$(AWSME_CLI)/AWSCloudFormation-cli.zip $(AWSME_CLI)/AWSCloudFormation-cli.zip $(AWSME_CLI)/AutoScaling-2011-01-01.zip \
 	$(AWSME_CLI)/CloudWatch-2010-08-01.zip $(AWSME_CLI)/ElasticLoadBalancing.zip $(AWSME_CLI)/IAMCli.zip \

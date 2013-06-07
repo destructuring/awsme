@@ -6,8 +6,6 @@
 /crash.log
 /output
 /git
-/libexec/virtualenv.pyc
-/.awscli
 /install
 /vendor/projects
 /config/*.yml
