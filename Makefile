@@ -1,5 +1,5 @@
 SHELL := /bin/bash
-AWSME_CLI := $(AWSME/vendor/projects)
+AWSME_CLI := $(AWSME)/vendor/projects
 
 all: ready
 
