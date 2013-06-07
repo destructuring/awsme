@@ -1,4 +1,5 @@
 SHELL := /bin/bash
+AWSME_CLI := $(AWSME_CLI)
 
 all: ready
 
@@ -8,7 +9,7 @@ ready:
 	@bin/cook -j config/microwave.json
 
 vivify:
-	@mkdir -p vendor/projects
+	@mkdir -p $(AWSME_CLI)
 
 pyaws: .awscli/bin/aws
 	
@@ -19,52 +20,52 @@ pyaws: .awscli/bin/aws
 	python libexec/virtualenv.py --extra-search-dir=vendor --never-download .awscli
 
 awscli: \
-	vendor/projects/AWSCloudFormation-cli.zip vendor/projects/AWSCloudFormation-cli.zip vendor/projects/AutoScaling-2011-01-01.zip \
-	vendor/projects/CloudWatch-2010-08-01.zip vendor/projects/ElasticLoadBalancing.zip vendor/projects/IAMCli.zip \
-	vendor/projects/ec2/bin/ec2-version vendor/projects/ec2/bin/ec2-ami-tools-version
+	$(AWSME_CLI)/AWSCloudFormation-cli.zip $(AWSME_CLI)/AWSCloudFormation-cli.zip $(AWSME_CLI)/AutoScaling-2011-01-01.zip \
+	$(AWSME_CLI)/CloudWatch-2010-08-01.zip $(AWSME_CLI)/ElasticLoadBalancing.zip $(AWSME_CLI)/IAMCli.zip \
+	$(AWSME_CLI)/ec2/bin/ec2-version $(AWSME_CLI)/ec2/bin/ec2-ami-tools-version
 
-vendor/projects/AWSCloudFormation-cli.zip: vivify
-	@cd vendor/projects && wget https://s3.amazonaws.com/cloudformation-cli/AWSCloudFormation-cli.zip
-	@ln -nfs AWSCloudFormation-1.0.12 vendor/projects/cfn
-	@cd vendor/projects && unzip AWSCloudFormation-cli.zip
+$(AWSME_CLI)/AWSCloudFormation-cli.zip: vivify
+	@cd $(AWSME_CLI) && wget https://s3.amazonaws.com/cloudformation-cli/AWSCloudFormation-cli.zip
+	@ln -nfs AWSCloudFormation-1.0.12 $(AWSME_CLI)/cfn
+	@cd $(AWSME_CLI) && unzip AWSCloudFormation-cli.zip
 
-vendor/projects/AmazonElastiCacheCli-latest.zip: vivify
-	@cd vendor/projects && wget https://s3.amazonaws.com/elasticache-downloads/AmazonElastiCacheCli-latest.zip
-	@ln -nfs AmazonElastiCacheCli-1.8.000 vendor/projects/elasticache
-	@cd vendor/projects && unzip AmazonElastiCacheCli-latest.zip
+$(AWSME_CLI)/AmazonElastiCacheCli-latest.zip: vivify
+	@cd $(AWSME_CLI) && wget https://s3.amazonaws.com/elasticache-downloads/AmazonElastiCacheCli-latest.zip
+	@ln -nfs AmazonElastiCacheCli-1.8.000 $(AWSME_CLI)/elasticache
+	@cd $(AWSME_CLI) && unzip AmazonElastiCacheCli-latest.zip
 
-vendor/projects/AutoScaling-2011-01-01.zip: vivify
-	@cd vendor/projects && wget http://ec2-downloads.s3.amazonaws.com/AutoScaling-2011-01-01.zip
-	@ln -nfs AutoScaling-1.0.61.2 vendor/projects/as
-	@cd vendor/projects && unzip AutoScaling-2011-01-01.zip
+$(AWSME_CLI)/AutoScaling-2011-01-01.zip: vivify
+	@cd $(AWSME_CLI) && wget http://ec2-downloads.s3.amazonaws.com/AutoScaling-2011-01-01.zip
+	@ln -nfs AutoScaling-1.0.61.2 $(AWSME_CLI)/as
+	@cd $(AWSME_CLI) && unzip AutoScaling-2011-01-01.zip
 
-vendor/projects/CloudWatch-2010-08-01.zip: vivify
-	@cd vendor/projects && wget http://ec2-downloads.s3.amazonaws.com/CloudWatch-2010-08-01.zip
-	@ln -nfs CloudWatch-1.0.13.4 vendor/projects/mon
-	@cd vendor/projects && unzip CloudWatch-2010-08-01.zip
+$(AWSME_CLI)/CloudWatch-2010-08-01.zip: vivify
+	@cd $(AWSME_CLI) && wget http://ec2-downloads.s3.amazonaws.com/CloudWatch-2010-08-01.zip
+	@ln -nfs CloudWatch-1.0.13.4 $(AWSME_CLI)/mon
+	@cd $(AWSME_CLI) && unzip CloudWatch-2010-08-01.zip
 
-vendor/projects/ElasticLoadBalancing.zip: vivify
-	@cd vendor/projects && wget http://ec2-downloads.s3.amazonaws.com/ElasticLoadBalancing.zip
-	@ln -nfs ElasticLoadBalancing-1.0.17.0 vendor/projects/elb
-	@cd vendor/projects && unzip ElasticLoadBalancing.zip
+$(AWSME_CLI)/ElasticLoadBalancing.zip: vivify
+	@cd $(AWSME_CLI) && wget http://ec2-downloads.s3.amazonaws.com/ElasticLoadBalancing.zip
+	@ln -nfs ElasticLoadBalancing-1.0.17.0 $(AWSME_CLI)/elb
+	@cd $(AWSME_CLI) && unzip ElasticLoadBalancing.zip
 
-vendor/projects/IAMCli.zip: vivify
-	@cd vendor/projects && wget http://awsiammedia.s3.amazonaws.com/public/tools/cli/latest/IAMCli.zip
-	@ln -nfs IAMCli-1.5.0 vendor/projects/iam
-	@cd vendor/projects && unzip IAMCli.zip
+$(AWSME_CLI)/IAMCli.zip: vivify
+	@cd $(AWSME_CLI) && wget http://awsiammedia.s3.amazonaws.com/public/tools/cli/latest/IAMCli.zip
+	@ln -nfs IAMCli-1.5.0 $(AWSME_CLI)/iam
+	@cd $(AWSME_CLI) && unzip IAMCli.zip
 
-vendor/projects/ec2-api-tools.zip: vivify
-	@cd vendor/projects && wget http://s3.amazonaws.com/ec2-downloads/ec2-api-tools.zip
-	@cd vendor/projects && unzip ec2-api-tools.zip
+$(AWSME_CLI)/ec2-api-tools.zip: vivify
+	@cd $(AWSME_CLI) && wget http://s3.amazonaws.com/ec2-downloads/ec2-api-tools.zip
+	@cd $(AWSME_CLI) && unzip ec2-api-tools.zip
 
-vendor/projects/ec2-ami-tools.zip: vivify
-	@cd vendor/projects && wget http://s3.amazonaws.com/ec2-downloads/ec2-ami-tools.zip
-	@cd vendor/projects && unzip ec2-ami-tools.zip
+$(AWSME_CLI)/ec2-ami-tools.zip: vivify
+	@cd $(AWSME_CLI) && wget http://s3.amazonaws.com/ec2-downloads/ec2-ami-tools.zip
+	@cd $(AWSME_CLI) && unzip ec2-ami-tools.zip
 
-vendor/projects/ec2/bin/ec2-version: vendor/projects/ec2-api-tools.zip
-	@mkdir -p vendor/projects/ec2
-	@rsync -ia vendor/projects/ec2-api-tools-1.6.7.3/. vendor/projects/ec2/
+$(AWSME_CLI)/ec2/bin/ec2-version: $(AWSME_CLI)/ec2-api-tools.zip
+	@mkdir -p $(AWSME_CLI)/ec2
+	@rsync -ia $(AWSME_CLI)/ec2-api-tools-1.6.7.3/. $(AWSME_CLI)/ec2/
 
-vendor/projects/ec2/bin/ec2-ami-tools-version: vendor/projects/ec2/bin/ec2-version vendor/projects/ec2-ami-tools.zip
-	@rsync -ia vendor/projects/ec2-ami-tools-1.4.0.9/. vendor/projects/ec2/
+$(AWSME_CLI)/ec2/bin/ec2-ami-tools-version: $(AWSME_CLI)/ec2/bin/ec2-version $(AWSME_CLI)/ec2-ami-tools.zip
+	@rsync -ia $(AWSME_CLI)/ec2-ami-tools-1.4.0.9/. $(AWSME_CLI)/ec2/
 
