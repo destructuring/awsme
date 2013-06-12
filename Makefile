@@ -19,12 +19,12 @@ awscli: \
 	$(AWSME_CLI)/ec2/bin/ec2-version $(AWSME_CLI)/ec2/bin/ec2-ami-tools-version
 
 $(AWSME_CLI)/AWSCloudFormation-cli.zip: $(AWSME_CLI)/.gitignore
-	@cd $(AWSME_CLI) && curl -O https://s3.amazonaws.com/cloudformation-cli/AWSCloudFormation-cli.zip
+	@cd $(AWSME_CLI) && curl -O http://s3.amazonaws.com/cloudformation-cli/AWSCloudFormation-cli.zip
 	@ln -nfs AWSCloudFormation-1.0.12 $(AWSME_CLI)/cfn
 	@cd $(AWSME_CLI) && unzip -o AWSCloudFormation-cli.zip
 
 $(AWSME_CLI)/AmazonElastiCacheCli-latest.zip: $(AWSME_CLI)/.gitignore
-	@cd $(AWSME_CLI) && curl -O https://s3.amazonaws.com/elasticache-downloads/AmazonElastiCacheCli-latest.zip
+	@cd $(AWSME_CLI) && curl -O http://s3.amazonaws.com/elasticache-downloads/AmazonElastiCacheCli-latest.zip
 	@ln -nfs AmazonElastiCacheCli-1.8.000 $(AWSME_CLI)/elasticache
 	@cd $(AWSME_CLI) && unzip -o AmazonElastiCacheCli-latest.zip
 
