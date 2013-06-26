@@ -48,6 +48,11 @@ $(AWSME_CLI)/IAMCli.zip: $(AWSME_CLI)/.gitignore
 	@ln -nfs IAMCli-1.5.0 $(AWSME_CLI)/iam
 	@cd $(AWSME_CLI) && unzip -o IAMCli.zip
 
+$(AWSME_CLI)/RDSCli.zip: $(AWSME_CLI)/.gitignore
+	@cd $(AWSME_CLI) && curl -O http://s3.amazonaws.com/rds-downloads/RDSCli.zip
+	@ln -nfs RDSCli-1.14.001 $(AWSME_CLI)/rds
+	@cd $(AWSME_CLI) && unzip -o RDSCli.zip
+
 $(AWSME_CLI)/ec2-api-tools.zip: $(AWSME_CLI)/.gitignore
 	@cd $(AWSME_CLI) && curl -O http://s3.amazonaws.com/ec2-downloads/ec2-api-tools.zip
 	@cd $(AWSME_CLI) && unzip -o ec2-api-tools.zip
