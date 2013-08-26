@@ -63,7 +63,7 @@ $(AWSME_CLI)/ec2-ami-tools.zip: $(AWSME_CLI)/.gitignore
 
 $(AWSME_CLI)/ec2/bin/ec2-version: $(AWSME_CLI)/ec2-api-tools.zip
 	@mkdir -p $(AWSME_CLI)/ec2
-	@rsync -iaO --exclude license.txt --exclude notice.txt $(AWSME_CLI)/ec2-api-tools-1.6.8.1/* $(AWSME_CLI)/ec2/
+	@rsync -iaO --exclude license.txt --exclude notice.txt $(AWSME_CLI)/ec2-api-tools-1.6.9.0/* $(AWSME_CLI)/ec2/
 
 $(AWSME_CLI)/ec2/bin/ec2-ami-tools-version: $(AWSME_CLI)/ec2/bin/ec2-version $(AWSME_CLI)/ec2-ami-tools.zip
 	@rsync -ia $(AWSME_CLI)/ec2-ami-tools-1.4.0.9/* $(AWSME_CLI)/ec2/
