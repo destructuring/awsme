@@ -1,6 +1,16 @@
 SHELL := /bin/bash
 AWSME_CLI := $(AWSME)/vendor/projects
 
+LATEST_CFN := $(shell ls -d $(AWSME_CLI)/AWSCloudFormation-* | bin/latest-release)
+LATEST_ELASTICACHE := $(shell ls -d $(AWSME_CLI)/AmazonElastiCacheCli-* | bin/latest-release)
+LATEST_AS := $(shell ls -d $(AWSME_CLI)/AutoScaling-* | bin/latest-release)
+LATEST_MON := $(shell ls -d $(AWSME_CLI)/CloudWatch-* | bin/latest-release)
+LATEST_ELB := $(shell ls -d $(AWSME_CLI)/ElasticLoadBalancing-* | bin/latest-release)
+LATEST_IAM := $(shell ls -d $(AWSME_CLI)/IAMCli-* | bin/latest-release)
+LATEST_RDS := $(shell ls -d $(AWSME_CLI)/RDSCli-* | bin/latest-release)
+LATEST_EC2 := $(shell ls -d $(AWSME_CLI)/ec2-api-tools-* | bin/latest-release)
+LATEST_AMI := $(shell ls -d $(AWSME_CLI)/ec2-ami-tools-* | bin/latest-release)
+
 all: ready
 
 ready:
@@ -20,56 +30,56 @@ awscli: \
 
 $(AWSME_CLI)/AWSCloudFormation-cli.zip: $(AWSME_CLI)/.gitignore
 	@cd $(AWSME_CLI) && curl -O http://s3.amazonaws.com/cloudformation-cli/AWSCloudFormation-cli.zip
-	@ln -nfs AWSCloudFormation-1.0.12 $(AWSME_CLI)/cfn
-	@cd $(AWSME_CLI) && unzip -o AWSCloudFormation-cli.zip
+	@cd $(AWSME_CLI) && unzip -o $@
+	@ln -nfs $(LATEST_CFN) $(AWSME_CLI)/cfn
 
 $(AWSME_CLI)/AmazonElastiCacheCli-latest.zip: $(AWSME_CLI)/.gitignore
 	@cd $(AWSME_CLI) && curl -O http://s3.amazonaws.com/elasticache-downloads/AmazonElastiCacheCli-latest.zip
-	@ln -nfs AmazonElastiCacheCli-1.8.000 $(AWSME_CLI)/elasticache
-	@cd $(AWSME_CLI) && unzip -o AmazonElastiCacheCli-latest.zip
+	@cd $(AWSME_CLI) && unzip -o $@
+	@ln -nfs $(LATEST_ELASTICACHE) $(AWSME_CLI)/elasticache
 
 $(AWSME_CLI)/AutoScaling-2011-01-01.zip: $(AWSME_CLI)/.gitignore
 	@cd $(AWSME_CLI) && curl -O http://ec2-downloads.s3.amazonaws.com/AutoScaling-2011-01-01.zip
-	@ln -nfs AutoScaling-1.0.61.2 $(AWSME_CLI)/as
-	@cd $(AWSME_CLI) && unzip -o AutoScaling-2011-01-01.zip
+	@cd $(AWSME_CLI) && unzip -o $@
+	@ln -nfs $(LATEST_AS) $(AWSME_CLI)/as
 
 $(AWSME_CLI)/CloudWatch-2010-08-01.zip: $(AWSME_CLI)/.gitignore
 	@cd $(AWSME_CLI) && curl -O http://ec2-downloads.s3.amazonaws.com/CloudWatch-2010-08-01.zip
-	@ln -nfs CloudWatch-1.0.13.4 $(AWSME_CLI)/mon
-	@cd $(AWSME_CLI) && unzip -o CloudWatch-2010-08-01.zip
+	@cd $(AWSME_CLI) && unzip -o $@
+	@ln -nfs $(LATEST_MON) -1.0.13.4 $(AWSME_CLI)/mon
 
 $(AWSME_CLI)/ElasticLoadBalancing.zip: $(AWSME_CLI)/.gitignore
 	@cd $(AWSME_CLI) && curl -O http://ec2-downloads.s3.amazonaws.com/ElasticLoadBalancing.zip
-	@ln -nfs ElasticLoadBalancing-1.0.17.0 $(AWSME_CLI)/elb
-	@cd $(AWSME_CLI) && unzip -o ElasticLoadBalancing.zip
+	@cd $(AWSME_CLI) && unzip -o $@
+	@ln -nfs $(LATEST_ELB) $(AWSME_CLI)/elb
 
 $(AWSME_CLI)/IAMCli.zip: $(AWSME_CLI)/.gitignore
 	@cd $(AWSME_CLI) && curl -O http://awsiammedia.s3.amazonaws.com/public/tools/cli/latest/IAMCli.zip
-	@ln -nfs IAMCli-1.5.0 $(AWSME_CLI)/iam
-	@cd $(AWSME_CLI) && unzip -o IAMCli.zip
+	@cd $(AWSME_CLI) && unzip -o $@
+	@ln -nfs $(LATEST_IAM) $(AWSME_CLI)/iam
 
 $(AWSME_CLI)/RDSCli.zip: $(AWSME_CLI)/.gitignore
 	@cd $(AWSME_CLI) && curl -O http://s3.amazonaws.com/rds-downloads/RDSCli.zip
-	@ln -nfs RDSCli-1.14.001 $(AWSME_CLI)/rds
-	@cd $(AWSME_CLI) && unzip -o RDSCli.zip
+	@cd $(AWSME_CLI) && unzip -o $@
+	@ln -nfs $(LATEST_RDS) $(AWSME_CLI)/rds
 
 $(AWSME_CLI)/ec2-api-tools.zip: $(AWSME_CLI)/.gitignore
 	@cd $(AWSME_CLI) && curl -O http://s3.amazonaws.com/ec2-downloads/ec2-api-tools.zip
-	@cd $(AWSME_CLI) && unzip -o ec2-api-tools.zip
+	@cd $(AWSME_CLI) && unzip -o $@
 
 $(AWSME_CLI)/ec2-ami-tools.zip: $(AWSME_CLI)/.gitignore
 	@cd $(AWSME_CLI) && curl -O http://s3.amazonaws.com/ec2-downloads/ec2-ami-tools.zip
-	@cd $(AWSME_CLI) && unzip -o ec2-ami-tools.zip
+	@cd $(AWSME_CLI) && unzip -o $@
 
 $(AWSME_CLI)/ec2/bin/ec2-version: $(AWSME_CLI)/ec2-api-tools.zip
 	@mkdir -p $(AWSME_CLI)/ec2
-	@rsync -iaO --exclude license.txt --exclude notice.txt $(AWSME_CLI)/ec2-api-tools-1.6.9.0/* $(AWSME_CLI)/ec2/
+	@rsync -iaO --exclude license.txt --exclude notice.txt $(LATEST_EC2) $(AWSME_CLI)/ec2/
 
 $(AWSME_CLI)/ec2/bin/ec2-ami-tools-version: $(AWSME_CLI)/ec2/bin/ec2-version $(AWSME_CLI)/ec2-ami-tools.zip
-	@rsync -ia $(AWSME_CLI)/ec2-ami-tools-1.4.0.9/* $(AWSME_CLI)/ec2/
+	@rsync -ia $(LATEST_AMI) $(AWSME_CLI)/ec2/
 
 $(AWSME_CLI)/ec2/bin/ec2-metadata: $(AWSME_CLI)/ec2/bin/ec2-version $(AWSME_CLI)/ec2-ami-tools.zip
-	@curl http://s3.amazonaws.com/ec2metadata/ec2-metadata > $(AWSME_CLI)/ec2/bin/ec2-metadata.tmp
-	@chmod 755 $(AWSME_CLI)/ec2/bin/ec2-metadata.tmp
-	@mv $(AWSME_CLI)/ec2/bin/ec2-metadata.tmp $(AWSME_CLI)/ec2/bin/ec2-metadata
+	@curl http://s3.amazonaws.com/ec2metadata/ec2-metadata > $@.tmp
+	@chmod 755 $@.tmp
+	@mv $@.tmp $@
 
