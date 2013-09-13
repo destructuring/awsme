@@ -54,7 +54,7 @@ $(AWSME_CLI)/CloudWatch-2010-08-01.zip: $(AWSME_CLI)/.gitignore
 	@cd $(AWSME_CLI) && curl -O http://ec2-downloads.s3.amazonaws.com/CloudWatch-2010-08-01.zip
 	@cd $(AWSME_CLI) && unzip -o $@
 
-$(AWSME_CLI)/oud-search-tools-1.0.2.3-2013.08.02.tar.gz: $(AWSME_CLI)/.gitignore
+$(AWSME_CLI)/cloud-search-tools-1.0.2.3-2013.08.02.tar.gz: $(AWSME_CLI)/.gitignore
 	@cd $(AWSME_CLI) && curl -O http://s3.amazonaws.com/amazon-cloudsearch-data/cloud-search-tools-1.0.2.3-2013.08.02.tar.gz
 	@cd $(AWSME_CLI) && unzip -o $@
 
