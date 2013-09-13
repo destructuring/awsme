@@ -17,6 +17,7 @@ export AWS_IAM_HOME="$AWSME/vendor/projects/iam"
 export AWS_ELB_HOME="$AWSME/vendor/projects/elb"
 export AWS_ELASTICACHE_HOME="$AWSME/vendor/projects/elasticache"
 export AWS_CLOUDWATCH_HOME="$AWSME/vendor/projects/mon"
+export CS_HOME="$AWSME/vendor/projects/cs"
 export AWS_RDS_HOME="$AWSME/vendor/projects/rds"
 
 : ${JAVA_HOME:="$(/usr/libexec/java_home 2>&-)"}
@@ -77,4 +78,4 @@ if [[ -z "EC2_CERT" ]]; then
   exit 1
 fi
 
-PATH="$EC2_HOME/bin:$AWS_CLOUDFORMATION_HOME/bin:$AWS_AUTO_SCALING_HOME/bin:$AWS_ELB_HOME/bin:$AWS_IAM_HOME/bin:$AWS_ELASTICACHE_HOME/bin:$AWS_CLOUDWATCH_HOME/bin:$AWS_RDS_HOME/bin:$PATH"
+PATH="$EC2_HOME/bin:$AWS_CLOUDFORMATION_HOME/bin:$AWS_AUTO_SCALING_HOME/bin:$AWS_ELB_HOME/bin:$AWS_IAM_HOME/bin:$AWS_ELASTICACHE_HOME/bin:$AWS_CLOUDWATCH_HOME/bin:$CS_HOME/bin:$AWS_RDS_HOME/bin:$PATH"
