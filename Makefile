@@ -1,4 +1,6 @@
 SHELL := /bin/bash
+AWSME := $(PWD)
+export AWSME
 AWSME_CLI := $(AWSME)/vendor/projects
 
 LATEST_CFN ?= $(shell ls -d $(AWSME_CLI)/AWSCloudFormation-* | bin/latest-release)
@@ -23,10 +25,12 @@ $(AWSME_CLI)/.gitignore:
 	@mkdir -p $(AWSME_CLI)
 	@touch $(AWSME_CLI)/.gitignore
 
-awscli: \
-	$(AWSME_CLI)/AWSCloudFormation-cli.zip $(AWSME_CLI)/AWSCloudFormation-cli.zip $(AWSME_CLI)/AutoScaling-2011-01-01.zip \
-	$(AWSME_CLI)/CloudWatch-2010-08-01.zip $(AWSME_CLI)/ElasticLoadBalancing.zip $(AWSME_CLI)/IAMCli.zip \
+cli: \
+	$(AWSME_CLI)/AWSCloudFormation-cli.zip $(AWSME_CLI)/AWSCloudFormation-cli.zip \
+	$(AWSME_CLI)/ElasticLoadBalancing.zip $(AWSME_CLI)/IAMCli.zip \
 	$(AWSME_CLI)/AmazonElastiCacheCli-latest.zip $(AWSME_CLI)/RDSCli.zip \
+	$(AWSME_CLI)/AutoScaling-2011-01-01.zip \
+	$(AWSME_CLI)/CloudWatch-2010-08-01.zip \
 	$(AWSME_CLI)/cloud-search-tools-1.0.2.3-2013.08.02.tar.gz \
 	$(AWSME_CLI)/ec2/bin/ec2-version $(AWSME_CLI)/ec2/bin/ec2-ami-tools-version $(AWSME_CLI)/ec2/bin/ec2-metadata
 	@ln -nfs $(LATEST_CFN) $(AWSME_CLI)/cfn
@@ -46,18 +50,6 @@ $(AWSME_CLI)/AmazonElastiCacheCli-latest.zip: $(AWSME_CLI)/.gitignore
 	@cd $(AWSME_CLI) && curl -O http://s3.amazonaws.com/elasticache-downloads/AmazonElastiCacheCli-latest.zip
 	@cd $(AWSME_CLI) && unzip -o $@
 
-$(AWSME_CLI)/AutoScaling-2011-01-01.zip: $(AWSME_CLI)/.gitignore
-	@cd $(AWSME_CLI) && curl -O http://ec2-downloads.s3.amazonaws.com/AutoScaling-2011-01-01.zip
-	@cd $(AWSME_CLI) && unzip -o $@
-
-$(AWSME_CLI)/CloudWatch-2010-08-01.zip: $(AWSME_CLI)/.gitignore
-	@cd $(AWSME_CLI) && curl -O http://ec2-downloads.s3.amazonaws.com/CloudWatch-2010-08-01.zip
-	@cd $(AWSME_CLI) && unzip -o $@
-
-$(AWSME_CLI)/cloud-search-tools-1.0.2.3-2013.08.02.tar.gz: $(AWSME_CLI)/.gitignore
-	@cd $(AWSME_CLI) && curl -O http://s3.amazonaws.com/amazon-cloudsearch-data/cloud-search-tools-1.0.2.3-2013.08.02.tar.gz
-	@cd $(AWSME_CLI) && tar xvfz $@
-
 $(AWSME_CLI)/ElasticLoadBalancing.zip: $(AWSME_CLI)/.gitignore
 	@cd $(AWSME_CLI) && curl -O http://ec2-downloads.s3.amazonaws.com/ElasticLoadBalancing.zip
 	@cd $(AWSME_CLI) && unzip -o $@
@@ -69,6 +61,18 @@ $(AWSME_CLI)/IAMCli.zip: $(AWSME_CLI)/.gitignore
 $(AWSME_CLI)/RDSCli.zip: $(AWSME_CLI)/.gitignore
 	@cd $(AWSME_CLI) && curl -O http://s3.amazonaws.com/rds-downloads/RDSCli.zip
 	@cd $(AWSME_CLI) && unzip -o $@
+
+$(AWSME_CLI)/AutoScaling-2011-01-01.zip: $(AWSME_CLI)/.gitignore
+	@cd $(AWSME_CLI) && curl -O http://ec2-downloads.s3.amazonaws.com/AutoScaling-2011-01-01.zip
+	@cd $(AWSME_CLI) && unzip -o $@
+
+$(AWSME_CLI)/CloudWatch-2010-08-01.zip: $(AWSME_CLI)/.gitignore
+	@cd $(AWSME_CLI) && curl -O http://ec2-downloads.s3.amazonaws.com/CloudWatch-2010-08-01.zip
+	@cd $(AWSME_CLI) && unzip -o $@
+
+$(AWSME_CLI)/cloud-search-tools-1.0.2.3-2013.08.02.tar.gz: $(AWSME_CLI)/.gitignore
+	@cd $(AWSME_CLI) && curl -O http://s3.amazonaws.com/amazon-cloudsearch-data/cloud-search-tools-1.0.2.3-2013.08.02.tar.gz
+	@cd $(AWSME_CLI) && tar xvfz $@
 
 $(AWSME_CLI)/ec2-api-tools.zip: $(AWSME_CLI)/.gitignore
 	@cd $(AWSME_CLI) && curl -O http://s3.amazonaws.com/ec2-downloads/ec2-api-tools.zip
