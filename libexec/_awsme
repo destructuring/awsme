@@ -62,20 +62,4 @@ if [[ -z "$AWS_ACCESS_KEY" ]]; then
   exit 1
 fi
 
-EC2_PRIVATE_KEY="$AWSME/config/private-key.pem"
-export EC2_PRIVATE_KEY
-
-if [[ -z "EC2_PRIVATE_KEY" ]]; then
-  logger_fatal "specify your ec2 private certificate in environment variable EC2_PRIVATE_KEY or put in config/private-key.pem"
-  exit 1
-fi
-
-EC2_CERT="$AWSME/config/certificate.pem"
-export EC2_CERT
-
-if [[ -z "EC2_CERT" ]]; then
-  logger_fatal "specify your ec2 public certificate in environment variable EC2_CERT or put in config/certificate.pem"
-  exit 1
-fi
-
 PATH="$EC2_HOME/bin:$AWS_CLOUDFORMATION_HOME/bin:$AWS_AUTO_SCALING_HOME/bin:$AWS_ELB_HOME/bin:$AWS_IAM_HOME/bin:$AWS_ELASTICACHE_HOME/bin:$AWS_CLOUDWATCH_HOME/bin:$CS_HOME/bin:$AWS_RDS_HOME/bin:$PATH"

@@ -1,7 +1,4 @@
 SHELL := /bin/bash
-AWSME := $(PWD)
-export AWSME
-AWSME_CLI := $(AWSME)/vendor/projects
 
 LATEST_CFN ?= $(shell ls -d $(AWSME_CLI)/AWSCloudFormation-* | bin/latest-release)
 LATEST_ELASTICACHE ?= $(shell ls -d $(AWSME_CLI)/AmazonElastiCacheCli-* | bin/latest-release)
@@ -16,13 +13,10 @@ LATEST_AMI ?= $(shell ls -d $(AWSME_CLI)/ec2-ami-tools-* | bin/latest-release)
 
 all: ready
 
-ready: config/aws.yml
+ready:
 	@git submodule update --init --recursive
-	@bundle check 2>&1 >/dev/null || { bundle --local --path vendor/bundle 2>&1 > /dev/null || bundle check; }
+	@bundle check --path vendor/bundle 2>&1 >/dev/null || bundle --local --path vendor/bundle 2>&1 > /dev/null
 	@bin/cook -j config/microwave.json
-
-config/aws.yml:
-	@rsync -ia config/aws.yml.example config/aws.yml
 
 $(AWSME_CLI)/.gitignore:
 	@mkdir -p $(AWSME_CLI)
