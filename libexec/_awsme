@@ -1,24 +1,14 @@
 #!/bin/bash
 
-if [[ "$#" > 0 ]]; then
-  AWSME="$1"; shift
-else
-  : ${AWSME:="$(cd -P -- "$(dirname -- "${BASH_SOURCE}")/.." && pwd -P)"}
-fi
-
-export AWSME
-
-PATH="$PATH:${AWSME}/libexec"
-
-export EC2_HOME="$AWSME/vendor/projects/ec2"
-export AWS_CLOUDFORMATION_HOME="$AWSME/vendor/projects/cfn"
-export AWS_AUTO_SCALING_HOME="$AWSME/vendor/projects/as"
-export AWS_IAM_HOME="$AWSME/vendor/projects/iam"
-export AWS_ELB_HOME="$AWSME/vendor/projects/elb"
-export AWS_ELASTICACHE_HOME="$AWSME/vendor/projects/elasticache"
-export AWS_CLOUDWATCH_HOME="$AWSME/vendor/projects/mon"
-export CS_HOME="$AWSME/vendor/projects/cs"
-export AWS_RDS_HOME="$AWSME/vendor/projects/rds"
+export EC2_HOME="$AWSME_CLI/ec2"
+export AWS_CLOUDFORMATION_HOME="$AWSME_CLI/cfn"
+export AWS_AUTO_SCALING_HOME="$AWSME_CLI/as"
+export AWS_IAM_HOME="$AWSME_CLI/iam"
+export AWS_ELB_HOME="$AWSME_CLI/elb"
+export AWS_ELASTICACHE_HOME="$AWSME_CLI/elasticache"
+export AWS_CLOUDWATCH_HOME="$AWSME_CLI/mon"
+export CS_HOME="$AWSME_CLI/cs"
+export AWS_RDS_HOME="$AWSME_CLI/rds"
 
 : ${JAVA_HOME:="$(/usr/libexec/java_home 2>&-)"}
 export JAVA_HOME
