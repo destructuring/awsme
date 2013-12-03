@@ -1,0 +1,28 @@
+#!/bin/bash
+
+#/ NAME
+#/     puddle-cache -- dowload pip package and create index
+#/
+#/ SYNOPSIS
+#/     puddle cache [packages...]
+
+# figure out the project root under which bin, lib live
+shome="$(cd -P -- "$(dirname -- "$BASH_SOURCE")/.." && pwd -P)"
+
+# load a jason bourne library
+source "$shome/libexec/_jason"
+
+# entry point
+function main {
+  local ghome="./$(git rev-parse --show-cdup)"
+  local pth_cache="$ghome/vendor/cache"
+
+  set +u; source $ghome/bin/activate; set -u
+  mkdir -p "$pth_cache"
+  if [[ "$#" > 0 ]]; then
+    pip install --download-directory "$pth_cache" "$@"
+  fi
+  dir2pi "$pth_cache"
+}
+
+require sub "$BASH_SOURCE" "$@"
