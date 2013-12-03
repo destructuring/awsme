@@ -30,7 +30,7 @@ if [[ -z "$AWS_CREDENTIAL_FILE" ]]; then
   exit 1
 fi
 
-AWS_SECRET_KEY="$(ryaml $AWSME/config/aws.yml :aws_secret_access_key)"
+AWS_SECRET_KEY="$(ryaml $AWSME/config/aws.yml aws_secret_access_key)"
 if [[ -z "$AWS_SECRET_KEY" ]]; then
   AWS_SECRET_KEY="$(ryaml $AWSME/config/aws.yml AWS_SECRET_KEY)"
 fi
@@ -41,7 +41,7 @@ if [[ -z "$AWS_SECRET_KEY" ]]; then
   exit 1
 fi
 
-AWS_ACCESS_KEY="$(ryaml $AWSME/config/aws.yml :aws_access_key_id)"
+AWS_ACCESS_KEY="$(ryaml $AWSME/config/aws.yml aws_access_key_id)"
 if [[ -z "$AWS_ACCESS_KEY" ]]; then
   AWS_ACCESS_KEY="$(ryaml $AWSME/config/aws.yml AWS_ACCESS_KEY)"
 fi
