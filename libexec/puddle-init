@@ -21,7 +21,7 @@ function main {
     cmd_venv="$shome/libexec/virtualenv.py"
   fi
 
-  $cmd_venv --extra-search-dir=$shome/vendor/cache --never-download "$vhome"
+  $cmd_venv --extra-search-dir=$shome/vendor/puddle --never-download "$vhome"
 
   "$shome/bin/puddle" install pip2pi virtualenv
 }

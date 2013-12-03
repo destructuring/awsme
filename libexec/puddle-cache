@@ -15,7 +15,7 @@ source "$shome/libexec/_jason"
 # entry point
 function main {
   local ghome="./$(git rev-parse --show-cdup)"
-  local pth_cache="$ghome/vendor/cache"
+  local pth_cache="$ghome/vendor/puddle"
 
   set +u; source $ghome/bin/activate; set -u
   mkdir -p "$pth_cache"
