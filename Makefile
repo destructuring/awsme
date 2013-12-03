@@ -22,7 +22,13 @@ $(AWSME_CLI)/.gitignore:
 	@mkdir -p $(AWSME_CLI)
 	@touch $(AWSME_CLI)/.gitignore
 
-cli: \
+bin/virtualenv:
+	bin/puddle init
+
+bin/aws: bin/virtualenv
+	bin/puddle install awscli
+
+cli: bin/aws \
 	$(AWSME_CLI)/AWSCloudFormation-cli.zip $(AWSME_CLI)/AWSCloudFormation-cli.zip \
 	$(AWSME_CLI)/ElasticLoadBalancing.zip $(AWSME_CLI)/IAMCli.zip \
 	$(AWSME_CLI)/AmazonElastiCacheCli-latest.zip $(AWSME_CLI)/RDSCli.zip \
