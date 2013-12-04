@@ -10,6 +10,10 @@ export AWS_CLOUDWATCH_HOME="$AWSME_CLI/mon"
 export CS_HOME="$AWSME_CLI/cs"
 export AWS_RDS_HOME="$AWSME_CLI/rds"
 
+: ${AWS_DEFAULT_REGION:=us-west-1}
+export AWS_DEFAULT_REGION
+export EC2_URL="ec2.${AWS_DEFAULT_REGION}.amazonaws.com"
+
 : ${JAVA_HOME:="$(/usr/libexec/java_home 2>&-)"}
 export JAVA_HOME
 
