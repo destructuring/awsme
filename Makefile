@@ -28,10 +28,7 @@ bin/virtualenv:
 bin/aws: bin/virtualenv
 	bin/puddle install awscli
 
-bin/pjson: bin/virtualenv
-	bin/puddle install pjson
-
-cli: bin/aws bin/pjson \
+cli: bin/aws \
 	$(AWSME_CLI)/AWSCloudFormation-cli.zip $(AWSME_CLI)/AWSCloudFormation-cli.zip \
 	$(AWSME_CLI)/ElasticLoadBalancing.zip $(AWSME_CLI)/IAMCli.zip \
 	$(AWSME_CLI)/AmazonElastiCacheCli-latest.zip $(AWSME_CLI)/RDSCli.zip \
