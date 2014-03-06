@@ -12,22 +12,17 @@ shome="$(cd -P -- "$(dirname -- "$BASH_SOURCE")/.." && pwd -P)"
 # load a jason bourne library
 source "$shome/libexec/_jason"
 
+DEFINE_string python "python" "Path to python" p
+
 # entry point
 function main {
   local vhome="."
 
   local cmd_venv="$shome/libexec/virtualenv.py"
 
-  local tmp_python="$(mktemp -d -t XXXXXX)"
-  PATH="$tmp_python:$PATH"
-
-  if [[ -x "$(which python2.7 2>&-)" ]]; then
-    ln -vnfs "$(which python2.7)" "$tmp_python/python"
-  fi
-
-  rm -f "$vhome/bin/python" "$vhome/bin/virtualenv"
+  (set +f; rm -f "$vhome/bin/python"* "$vhome/bin/virtualenv")
   (set +f; rm -rf "$vhome/lib/python"* "$vhome/include/python"*)
-  $cmd_venv --extra-search-dir=$shome/vendor/puddle --never-download "$vhome"
+  $cmd_venv --extra-search-dir=$shome/vendor/puddle -p "$FLAGS_python" "$vhome"
 
   "$shome/bin/puddle" install pip2pi virtualenv
 
