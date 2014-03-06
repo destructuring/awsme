@@ -59,4 +59,7 @@
 *.pyc
 /bin/pjson
 /bin/pygmentize
+/bin/pip2
+/bin/pip2.7
+/bin/pip2whl
 

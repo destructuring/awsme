@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python
 """Create a "virtual" Python installation
 """
 
@@ -1755,7 +1755,7 @@ def make_relative_path(source, dest, dest_is_directory=True):
 ############################################################
 ## Bootstrap script creation:
 
-def create_bootstrap_script(extra_text, python_version='2.7'):
+def create_bootstrap_script(extra_text, python_version=''):
     """
     Creates a bootstrap script, which is like this script but with
     extend_parser, adjust_options, and after_install hooks.
