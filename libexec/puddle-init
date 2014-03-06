@@ -25,8 +25,6 @@ function main {
   $cmd_venv --extra-search-dir=$shome/vendor/puddle -p "$FLAGS_python" "$vhome"
 
   "$shome/bin/puddle" install pip2pi virtualenv
-
-  rm -rf "$tmp_python"
 }
 
 require sub "$BASH_SOURCE" "$@"
