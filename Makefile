@@ -11,6 +11,8 @@ LATEST_RDS ?= $(shell ls -d $(AWSME_CLI)/RDSCli-* | bin/latest-release)
 LATEST_EC2 ?= $(shell ls -d $(AWSME_CLI)/ec2-api-tools-* | bin/latest-release)
 LATEST_AMI ?= $(shell ls -d $(AWSME_CLI)/ec2-ami-tools-* | bin/latest-release)
 
+PYTHON := python
+
 all: ready
 
 ready:
@@ -23,7 +25,7 @@ $(AWSME_CLI)/.gitignore:
 	@touch $(AWSME_CLI)/.gitignore
 
 bin/virtualenv:
-	bin/puddle init
+	bin/puddle init -p $(PYTHON)
 
 bin/aws: bin/virtualenv
 	bin/puddle install awscli
