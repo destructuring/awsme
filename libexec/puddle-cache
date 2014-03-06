@@ -14,10 +14,9 @@ source "$shome/libexec/_jason"
 
 # entry point
 function main {
-  local ghome="./$(git rev-parse --show-cdup)"
-  local pth_cache="$ghome/vendor/puddle"
+  local pth_cache="$shome/vendor/puddle"
 
-  set +u; source $ghome/bin/activate; set -u
+  set +u; source $shome/bin/activate; set -u
   mkdir -p "$pth_cache"
   if [[ "$#" > 0 ]]; then
     pip install --download-directory "$pth_cache" "$@"

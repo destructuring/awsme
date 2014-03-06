@@ -14,10 +14,9 @@ source "$shome/libexec/_jason"
 
 # entry point
 function main {
-  local ghome="$(cd -P "./$(git rev-parse --show-cdup)" && pwd -P)"
-  local pth_cache="$ghome/vendor/puddle"
+  local pth_cache="$shome/vendor/puddle"
 
-  set +u; source $ghome/bin/activate; set -u
+  set +u; source $shome/bin/activate; set -u
   pip install --upgrade --index-url=file://"$pth_cache/simple" "$@"
 }
 

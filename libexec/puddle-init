@@ -1,10 +1,10 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 #/ NAME
 #/     puddle-init -- make a Python virtualenv
 #/
 #/ SYNOPSIS
-#/     puddle init where]
+#/     puddle init where
 
 # figure out the project root under which bin, lib live
 shome="$(cd -P -- "$(dirname -- "$BASH_SOURCE")/.." && pwd -P)"
@@ -16,14 +16,22 @@ source "$shome/libexec/_jason"
 function main {
   local vhome="."
 
-  local cmd_venv="$shome/bin/virtualenv"
-  if [[ ! -x "$cmd_venv" ]]; then
-    cmd_venv="$shome/libexec/virtualenv.py"
+  local cmd_venv="$shome/libexec/virtualenv.py"
+
+  local tmp_python="$(mktemp -d -t XXXXXX)"
+  PATH="$tmp_python:$PATH"
+
+  if [[ -x "$(which python2.7 2>&-)" ]]; then
+    ln -vnfs "$(which python2.7)" "$tmp_python/python"
   fi
 
+  rm -f "$vhome/bin/python" "$vhome/bin/virtualenv"
+  (set +f; rm -rf "$vhome/lib/python"* "$vhome/include/python"*)
   $cmd_venv --extra-search-dir=$shome/vendor/puddle --never-download "$vhome"
 
   "$shome/bin/puddle" install pip2pi virtualenv
+
+  rm -rf "$tmp_python"
 }
 
 require sub "$BASH_SOURCE" "$@"
