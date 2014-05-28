@@ -1,3 +1,3 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 while read -r a; do echo $(echo "$a" | perl -pe 's{(\d+)}{sprintf("%08d",$1)}eg') "$a"; done | egrep -v '\.(zip|tar.gz)$' | LANG=C sort -r | awk 'NR == 1 {print $2}'

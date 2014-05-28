@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 #/ NAME
 #/     edit-gem -- set environment to hint to Gemfile to use a local gemspec

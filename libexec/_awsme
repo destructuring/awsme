@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 export EC2_HOME="$AWSME_CLI/ec2"
 export AWS_CLOUDFORMATION_HOME="$AWSME_CLI/cfn"

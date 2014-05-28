@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 #/ NAME
 #/     publish-gem -- publish a gem to a local, remote rubygems, geminabox repository

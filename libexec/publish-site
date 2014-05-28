@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 #/ NAME
 #/     publish-site -- commit files from one dir to a repo/branch/dir

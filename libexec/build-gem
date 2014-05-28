@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 #/ NAME
 #/     build-gem -- upload the latest (timestamp) rubygem to rubygems.org
