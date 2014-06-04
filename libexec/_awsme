@@ -28,12 +28,12 @@ if [[ -z "$JAVA_HOME" ]]; then
   exit 1
 fi
 
-AWS_CREDENTIAL_FILE="$AWSME/config/aws.txt"
-export AWS_CREDENTIAL_FILE
-if [[ -z "$AWS_CREDENTIAL_FILE" ]]; then
-  logger_fatal "specify your aws keys in config/aws.txt"
-  exit 1
-fi
+#AWS_CREDENTIAL_FILE="$AWSME/config/aws.txt"
+#export AWS_CREDENTIAL_FILE
+#if [[ -z "$AWS_CREDENTIAL_FILE" ]]; then
+#  logger_fatal "specify your aws keys in config/aws.txt"
+#  exit 1
+#fi
 
 awshome="$(unset CDPATH; cd -P -- "$(dirname -- "$BASH_SOURCE")/.." && pwd -P)"
 PATH="$awshome/bin:$EC2_HOME/bin:$AWS_CLOUDFORMATION_HOME/bin:$AWS_AUTO_SCALING_HOME/bin:$AWS_ELB_HOME/bin:$AWS_IAM_HOME/bin:$AWS_ELASTICACHE_HOME/bin:$AWS_CLOUDWATCH_HOME/bin:$CS_HOME/bin:$AWS_RDS_HOME/bin:$PATH"
